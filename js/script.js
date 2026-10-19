@@ -1,287 +1,217 @@
-const canvas = document.getElementById('artCanvas');
-const ctx = canvas.getContext('2d', { willReadFrequently: true });
+(() => {
+  const canvas = document.getElementById('canvas');
+  const wrap = document.getElementById('canvasWrap');
+  const ctx = canvas.getContext('2d');
+  const sizeInput = document.getElementById('brushSize');
+  const sizeValue = document.getElementById('sizeValue');
+  const hint = document.getElementById('canvasHint');
+  const toast = document.getElementById('toast');
 
-let plantillaActual = 'chibi';
-let herramientaActiva = 'pincel';
-let colorSeleccionado = '#ff758c';
-let dibujando = false;
-let ultimoX = 0;
-let ultimoY = 0;
-let historialPasos = [];
+  let tool = 'brush', color = '#ff76ad', brushSize = 8, background = '#ffffff';
+  let drawing = false, lastPoint = null, undoStack = [], hasArtwork = false, toastTimer;
+  let dpr = Math.max(1, window.devicePixelRatio || 1);
 
-// Paleta de colores estilo anime / estético / pastel
-const coloresPaleta = [
-    '#000000', '#ffffff', '#ff758c', '#ff7eb3', '#7928ca', 
-    '#4facfe', '#00f2fe', '#43e97b', '#38f9d7', '#fa709a', 
-    '#fee140', '#30cfd0', '#330867', '#a8ede9', '#fed6e3'
-];
+  function paintBackground() {
+    const w = canvas.width, h = canvas.height;
+    if (background === 'gradient') {
+      const g = ctx.createLinearGradient(0, 0, w, h);
+      g.addColorStop(0, '#fff0f7'); g.addColorStop(.5, '#e9e4ff'); g.addColorStop(1, '#e3fbf4');
+      ctx.fillStyle = g;
+    } else ctx.fillStyle = background;
+    ctx.fillRect(0, 0, w, h);
+  }
 
-// Inicializar Paleta de Colores en la Interfaz
-const paletteContainer = document.getElementById('colorPalette');
-coloresPaleta.forEach((hex, index) => {
-    const swatch = document.createElement('div');
-    swatch.className = `color-swatch ${index === 2 ? 'active' : ''}`;
-    swatch.style.backgroundColor = hex;
-    swatch.addEventListener('pointerdown', (e) => {
-        e.preventDefault();
-        document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
-        swatch.classList.add('active');
-        colorSeleccionado = hex;
-        if (herramientaActiva === 'borrador') cambiarHerramienta('pincel');
-    });
-    paletteContainer.appendChild(swatch);
-});
+  function resizeCanvas(preserve = true) {
+    let old;
+    if (preserve && canvas.width && canvas.height) old = document.createElement('canvas');
+    if (old) { old.width = canvas.width; old.height = canvas.height; old.getContext('2d').drawImage(canvas, 0, 0); }
+    const rect = wrap.getBoundingClientRect();
+    dpr = Math.max(1, window.devicePixelRatio || 1);
+    canvas.width = Math.max(1, Math.round(rect.width * dpr));
+    canvas.height = Math.max(1, Math.round(rect.height * dpr));
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    paintBackground();
+    if (old) ctx.drawImage(old, 0, 0, old.width, old.height, 0, 0, canvas.width, canvas.height);
+    else saveState();
+  }
 
-function ajustarDimensiones() {
-    const wrapper = document.querySelector('.canvas-wrapper');
-    canvas.width = wrapper.clientWidth;
-    canvas.height = wrapper.clientHeight;
-    cargarPlantilla(plantillaActual);
-}
+  function saveState() {
+    try {
+      undoStack.push(canvas.toDataURL('image/png'));
+      if (undoStack.length > 30) undoStack.shift();
+    } catch(e) {}
+  }
 
-window.addEventListener('resize', ajustarDimensiones);
+  function restoreState(data) {
+    const img = new Image();
+    img.onload = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      hasArtwork = undoStack.length > 1;
+      hint.style.display = hasArtwork ? 'none' : 'block';
+    };
+    img.src = data;
+  }
 
-// Cambio de Herramientas
-function cambiarHerramienta(tool) {
-    herramientaActiva = tool;
-    document.querySelectorAll('.tool-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.tool === tool);
-    });
-}
+  function pointFromEvent(e) {
+    const r = canvas.getBoundingClientRect();
+    return { x: (e.clientX - r.left) * dpr, y: (e.clientY - r.top) * dpr };
+  }
 
-document.querySelectorAll('.tool-btn').forEach(btn => {
-    btn.addEventListener('click', () => cambiarHerramienta(btn.dataset.tool));
-});
-
-// Selección de Plantillas Artísticas
-document.querySelectorAll('.thumb-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.querySelectorAll('.thumb-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        plantillaActual = btn.dataset.template;
-        cargarPlantilla(plantillaActual);
-    });
-});
-
-function cargarPlantilla(tipo) {
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    ctx.lineWidth = 5;
-    ctx.strokeStyle = '#1e1b4b';
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-
-    const cx = canvas.width / 2;
-    const cy = canvas.height / 2;
-
-    if (tipo === 'chibi') {
-        // Silueta Chibi Anime Estilizada
-        // Cabeza
-        ctx.beginPath();
-        ctx.arc(cx, cy - 30, 80, 0, Math.PI * 2);
-        ctx.stroke();
-        // Ojos Anime Grandes
-        ctx.beginPath();
-        ctx.arc(cx - 30, cy - 40, 20, 0, Math.PI * 2);
-        ctx.arc(cx + 30, cy - 40, 20, 0, Math.PI * 2);
-        ctx.stroke();
-        // Brillo Ojos
-        ctx.fillStyle = '#1e1b4b';
-        ctx.beginPath();
-        ctx.arc(cx - 25, cy - 45, 6, 0, Math.PI * 2);
-        ctx.arc(cx + 35, cy - 45, 6, 0, Math.PI * 2);
-        ctx.fill();
-        // Pelo orejas de gato / nekocat
-        ctx.beginPath();
-        ctx.moveTo(cx - 70, cy - 80);
-        ctx.lineTo(cx - 40, cy - 130);
-        ctx.lineTo(cx - 10, cy - 90);
-        ctx.moveTo(cx + 70, cy - 80);
-        ctx.lineTo(cx + 40, cy - 130);
-        ctx.lineTo(cx + 10, cy - 90);
-        ctx.stroke();
-        // Cuerpo y Lazo
-        ctx.beginPath();
-        ctx.moveTo(cx - 30, cy + 50);
-        ctx.lineTo(cx - 50, cy + 130);
-        ctx.lineTo(cx + 50, cy + 130);
-        ctx.lineTo(cx + 30, cy + 50);
-        ctx.stroke();
-
-    } else if (tipo === 'paisaje') {
-        // Paisaje Aesthetic / Montañas y Luna
-        ctx.beginPath();
-        ctx.arc(cx + 80, cy - 70, 45, 0, Math.PI * 2); // Luna
-        ctx.stroke();
-        // Montañas
-        ctx.beginPath();
-        ctx.moveTo(cx - 180, cy + 100);
-        ctx.lineTo(cx - 60, cy - 40);
-        ctx.lineTo(cx + 40, cy + 100);
-        ctx.lineTo(cx + 150, cy - 20);
-        ctx.lineTo(cx + 220, cy + 100);
-        ctx.stroke();
-        // Estrellas
-        [[-100, -80], [80, -120], [-40, -140], [130, -40]].forEach(([px, py]) => {
-            ctx.beginPath();
-            ctx.arc(cx + px, cy + py, 4, 0, Math.PI * 2);
-            ctx.fill();
-        });
-
-    } else if (tipo === 'cyberpunk') {
-        // Cyber City / Edificios futuristas
-        ctx.strokeRect(cx - 120, cy - 80, 70, 180);
-        ctx.strokeRect(cx - 40, cy - 120, 80, 220);
-        ctx.strokeRect(cx + 50, cy - 50, 70, 150);
-        // Detalles de ventanas
-        ctx.strokeRect(cx - 105, cy - 60, 40, 30);
-        ctx.strokeRect(cx - 20, cy - 100, 40, 40);
+  function startDraw(e) {
+    if (e.button !== undefined && e.button !== 0) return;
+    e.preventDefault();
+    drawing = true;
+    canvas.setPointerCapture?.(e.pointerId);
+    lastPoint = pointFromEvent(e);
+    if (tool === 'sticker') {
+      addSticker(selectedSticker, lastPoint);
+      drawing = false;
+      saveState();
+      return;
     }
-
-    guardarEstadoCanvas();
-}
-
-function guardarEstadoCanvas() {
-    if (historialPasos.length > 20) historialPasos.shift();
-    historialPasos.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
-}
-
-// Eventos de Dibujo Táctil y Mouse
-canvas.addEventListener('pointerdown', (e) => {
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    if (herramientaActiva === 'relleno') {
-        ejecutarRelleno(Math.floor(x), Math.floor(y), colorSeleccionado);
-        guardarEstadoCanvas();
-    } else {
-        dibujando = true;
-        ultimoX = x;
-        ultimoY = y;
-    }
-});
-
-canvas.addEventListener('pointermove', (e) => {
-    if (!dibujando || herramientaActiva === 'relleno') return;
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
     ctx.beginPath();
-    ctx.moveTo(ultimoX, ultimoY);
-    ctx.lineTo(x, y);
-
-    const grosor = Number(document.getElementById('brushSize').value);
-
-    if (herramientaActiva === 'borrador') {
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = grosor * 1.5;
-        ctx.shadowBlur = 0;
-    } else if (herramientaActiva === 'neon') {
-        ctx.strokeStyle = colorSeleccionado;
-        ctx.lineWidth = grosor * 0.75;
-        ctx.shadowColor = colorSeleccionado;
-        ctx.shadowBlur = 15;
-    } else {
-        ctx.strokeStyle = colorSeleccionado;
-        ctx.lineWidth = grosor;
-        ctx.shadowBlur = 0;
-    }
-
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
+    ctx.moveTo(lastPoint.x, lastPoint.y);
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.strokeStyle = tool === 'eraser' ? backgroundColorForBrush() : color;
+    ctx.lineWidth = brushSize * dpr * (tool === 'marker' ? 2.2 : 1);
+    if (tool === 'marker') ctx.globalAlpha = .42;
+    else ctx.globalAlpha = 1;
+    ctx.lineTo(lastPoint.x + .1, lastPoint.y + .1);
     ctx.stroke();
-    ctx.shadowBlur = 0; // Reset sombra
+    ctx.globalAlpha = 1;
+    hasArtwork = true; hint.style.display = 'none';
+  }
 
-    ultimoX = x;
-    ultimoY = y;
-});
+  function backgroundColorForBrush() {
+    if (background !== 'gradient') return background;
+    return '#ffffff';
+  }
 
-window.addEventListener('pointerup', () => {
-    if (dibujando) {
-        dibujando = false;
-        guardarEstadoCanvas();
+  function moveDraw(e) {
+    if (!drawing || tool === 'sticker') return;
+    e.preventDefault();
+    const p = pointFromEvent(e);
+    ctx.beginPath();
+    ctx.moveTo(lastPoint.x, lastPoint.y);
+    ctx.lineTo(p.x, p.y);
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.strokeStyle = tool === 'eraser' ? backgroundColorForBrush() : color;
+    ctx.lineWidth = brushSize * dpr * (tool === 'marker' ? 2.2 : 1);
+    ctx.globalAlpha = tool === 'marker' ? .42 : 1;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+    lastPoint = p;
+  }
+
+  function endDraw() {
+    if (!drawing) return;
+    drawing = false; lastPoint = null;
+    saveState();
+  }
+
+  let selectedSticker = '⭐';
+  function addSticker(sticker, p) {
+    const fontSize = Math.max(25, brushSize * 4.2) * dpr;
+    ctx.save();
+    ctx.font = `${fontSize}px "Apple Color Emoji","Segoe UI Emoji",sans-serif`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(sticker, p.x, p.y);
+    ctx.restore();
+    hasArtwork = true; hint.style.display = 'none';
+    showToast('¡Pegatina añadida! ✨');
+  }
+
+  function showToast(message) {
+    toast.textContent = message; toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 1900);
+  }
+
+  function clearCanvas(ask = true) {
+    if (ask && hasArtwork && !confirm('¿Quieres empezar de nuevo? Tu dibujo actual se borrará.')) return;
+    ctx.setTransform(1,0,0,1,0,0);
+    paintBackground(); undoStack = []; saveState();
+    hasArtwork = false; hint.style.display = 'block';
+    showToast('Lienzo listo para una nueva idea 💗');
+  }
+
+  function undo() {
+    if (undoStack.length <= 1) {
+      if (undoStack.length === 1) restoreState(undoStack[0]);
+      showToast('¡Ya estás al comienzo!');
+      return;
     }
-});
+    undoStack.pop();
+    restoreState(undoStack[undoStack.length - 1]);
+    showToast('Último paso deshecho ↶');
+  }
 
-// Botón Deshacer (Undo)
-document.getElementById('btnUndo').addEventListener('click', () => {
-    if (historialPasos.length > 1) {
-        historialPasos.pop(); // Quitar estado actual
-        const anterior = historialPasos[historialPasos.length - 1];
-        ctx.putImageData(anterior, 0, 0);
-    }
-});
-
-// Botón Limpiar
-document.getElementById('btnClear').addEventListener('click', () => {
-    cargarPlantilla(plantillaActual);
-});
-
-// Botón Guardar / Descargar
-document.getElementById('btnSave').addEventListener('click', () => {
+  function saveImage() {
     const link = document.createElement('a');
-    link.download = 'mi-arte-anime.png';
-    link.href = canvas.toDataURL();
+    link.download = 'mi-obra-dream-studio.png';
+    link.href = canvas.toDataURL('image/png');
     link.click();
-});
+    showToast('¡Tu obra está guardada! 🌟');
+  }
 
-// Algoritmo de Cubeta (Flood Fill)
-function ejecutarRelleno(startX, startY, fillColor) {
-    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const data = imgData.data;
-    const targetColor = [
-        data[(startY * canvas.width + startX) * 4],
-        data[(startY * canvas.width + startX) * 4 + 1],
-        data[(startY * canvas.width + startX) * 4 + 2],
-        data[(startY * canvas.width + startX) * 4 + 3]
-    ];
+  document.querySelectorAll('.tool').forEach(btn => btn.addEventListener('click', () => {
+    document.querySelectorAll('.tool').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active'); tool = btn.dataset.tool;
+    canvas.style.cursor = tool === 'eraser' ? 'cell' : 'crosshair';
+    showToast(({brush:'Pincel suave seleccionado 🖌️',pencil:'Lápiz seleccionado ✏️',marker:'Marcador seleccionado 🖍️',eraser:'Borrador seleccionado 🧽'})[tool]);
+  }));
 
-    const rgbFill = hexToRgb(fillColor);
-    if (coloresSimilares(targetColor, [rgbFill.r, rgbFill.g, rgbFill.b, 255])) return;
+  document.querySelectorAll('.swatch').forEach(btn => btn.addEventListener('click', () => setColor(btn.dataset.color, btn)));
+  function setColor(next, selectedButton) {
+    color = next;
+    document.querySelectorAll('.swatch').forEach(b => b.classList.remove('active'));
+    if (selectedButton) selectedButton.classList.add('active');
+    document.getElementById('customColor').value = next;
+  }
+  document.getElementById('customColor').addEventListener('input', e => setColor(e.target.value, null));
 
-    const pila = [[startX, startY]];
-    const w = canvas.width;
-    const h = canvas.height;
+  sizeInput.addEventListener('input', () => {
+    brushSize = Number(sizeInput.value);
+    sizeValue.textContent = `${brushSize} px`;
+  });
 
-    while (pila.length > 0) {
-        const [x, y] = pila.pop();
-        if (x < 0 || x >= w || y < 0 || y >= h) continue;
+  document.querySelectorAll('.bg-choice').forEach(btn => btn.addEventListener('click', () => {
+    document.querySelectorAll('.bg-choice').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    background = btn.dataset.bg;
+    const previous = document.createElement('canvas');
+    previous.width = canvas.width; previous.height = canvas.height;
+    previous.getContext('2d').drawImage(canvas, 0, 0);
+    paintBackground();
+    ctx.drawImage(previous, 0, 0);
+    saveState();
+    showToast('¡Fondo actualizado! 🌈');
+  }));
 
-        const idx = (y * w + x) * 4;
-        if (cumpleTolerancia(data, idx, targetColor)) {
-            data[idx] = rgbFill.r;
-            data[idx + 1] = rgbFill.g;
-            data[idx + 2] = rgbFill.b;
-            data[idx + 3] = 255;
+  document.querySelectorAll('.sticker').forEach(btn => btn.addEventListener('click', () => {
+    selectedSticker = btn.dataset.sticker;
+    tool = 'sticker';
+    document.querySelectorAll('.tool').forEach(b => b.classList.remove('active'));
+    hint.textContent = `Haz clic en el lienzo para colocar ${selectedSticker}`;
+    hint.style.display = 'block';
+    showToast(`Ahora coloca tu pegatina ${selectedSticker}`);
+  }));
 
-            pila.push([x + 1, y]);
-            pila.push([x - 1, y]);
-            pila.push([x, y + 1]);
-            pila.push([x, y - 1]);
-        }
-    }
-    ctx.putImageData(imgData, 0, 0);
-}
+  canvas.addEventListener('pointerdown', startDraw);
+  canvas.addEventListener('pointermove', moveDraw);
+  canvas.addEventListener('pointerup', endDraw);
+  canvas.addEventListener('pointercancel', endDraw);
+  canvas.addEventListener('pointerleave', endDraw);
+  document.getElementById('undoBtn').addEventListener('click', undo);
+  document.getElementById('clearBtn').addEventListener('click', () => clearCanvas(true));
+  document.getElementById('newBtn').addEventListener('click', () => clearCanvas(true));
+  document.getElementById('saveBtn').addEventListener('click', saveImage);
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); }
+  });
 
-function cumpleTolerancia(data, idx, baseColor) {
-    const tol = 35;
-    return (
-        Math.abs(data[idx] - baseColor[0]) < tol &&
-        Math.abs(data[idx + 1] - baseColor[1]) < tol &&
-        Math.abs(data[idx + 2] - baseColor[2]) < tol
-    );
-}
-
-function coloresSimilares(c1, c2) {
-    return Math.abs(c1[0] - c2[0]) < 5 && Math.abs(c1[1] - c2[1]) < 5 && Math.abs(c1[2] - c2[2]) < 5;
-}
-
-function hexToRgb(hex) {
-    const num = parseInt(hex.slice(1), 16);
-    return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
-}
-
-window.onload = ajustarDimensiones;
+  if ('ResizeObserver' in window) new ResizeObserver(() => resizeCanvas(true)).observe(wrap);
+  else window.addEventListener('resize', () => resizeCanvas(true));
+  requestAnimationFrame(() => resizeCanvas(false));
+})();
