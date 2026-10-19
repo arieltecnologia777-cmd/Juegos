@@ -153,12 +153,10 @@ function newRound(){
     b.className='option';
     b.textContent=label;
     
-    const handleChoice = (e)=>{
+    b.addEventListener('pointerdown', (e)=>{
       e.preventDefault();
       choose(val, b);
-    };
-    b.addEventListener('click', handleChoice);
-    b.addEventListener('touchend', handleChoice);
+    });
 
     $('options').appendChild(b);
   });
@@ -186,40 +184,29 @@ function choose(value,btn){
 }
 
 document.querySelectorAll('.play').forEach(b=>{
-  const startPlay = (e)=>{e.preventDefault();openGame(b.dataset.game)};
-  b.addEventListener('click', startPlay);
-  b.addEventListener('touchend', startPlay);
+  b.addEventListener('pointerdown', (e)=>{ e.preventDefault(); openGame(b.dataset.game); });
 });
 
 document.querySelectorAll('.age').forEach(b=>{
-  const changeAge = (e)=>{
+  b.addEventListener('pointerdown', (e)=>{
     e.preventDefault();
     document.querySelectorAll('.age').forEach(x=>x.classList.remove('active'));
     b.classList.add('active');
     age=Number(b.dataset.age);
     updateStats();
     speak(`Nivel para ${age} años. ¡Vamos a jugar!`);
-  };
-  b.addEventListener('click', changeAge);
-  b.addEventListener('touchend', changeAge);
+  });
 });
 
-const nextHandler = (e)=>{e.preventDefault();newRound();};
-$('nextBtn').addEventListener('click', nextHandler);$('nextBtn').addEventListener('touchend', nextHandler);
+$('nextBtn').addEventListener('pointerdown', (e)=>{ e.preventDefault(); newRound(); });$('closeBtn').addEventListener('pointerdown', (e)=>{ e.preventDefault(); $('modal').classList.remove('show'); if('speechSynthesis'in window)speechSynthesis.cancel(); });$('modal').addEventListener('pointerdown',e=>{if(e.target===$('modal'))$('closeBtn').click()});
 
-const closeHandler = (e)=>{e.preventDefault();$('modal').classList.remove('show');if('speechSynthesis'in window)speechSynthesis.cancel();};
-$('closeBtn').addEventListener('click', closeHandler);$('closeBtn').addEventListener('touchend', closeHandler);
-
-$('modal').addEventListener('click',e=>{if(e.target===$('modal'))$('closeBtn').click()});
-
-const soundHandler = (e)=>{
+$('soundBtn').addEventListener('pointerdown', (e)=>{
   e.preventDefault();
   sound=!sound;
   $('soundBtn').textContent=sound?'🔊':'🔇';
   if(!sound&&'speechSynthesis'in window)speechSynthesis.cancel();
   else speak('¡Hola, vamos a jugar!');
-};
-$('soundBtn').addEventListener('click', soundHandler);$('soundBtn').addEventListener('touchend', soundHandler);
+});
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape')$('closeBtn').click()});
 updateStats();
