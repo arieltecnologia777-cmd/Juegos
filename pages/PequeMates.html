@@ -62,8 +62,8 @@ h1{font-size:clamp(22px,3vw,34px);margin:0;font-weight:1000;letter-spacing:-1.2p
  <article class="card"><span class="star">⭐</span><div class="card-art">🍎 🔢 🍎</div><h3>Cuenta y elige</h3><p>Cuenta los objetos y toca el número correcto.</p><button class="play" data-game="count">▶ Jugar</button></article>
  <article class="card"><span class="star">⭐</span><div class="card-art">🐻 🐻 🐻</div><h3>¿Cuántos hay?</h3><p>¡Mira con atención y descubre cuántos ves!</p><button class="play" data-game="howmany">▶ Jugar</button></article>
  <article class="card"><span class="star">⭐</span><div class="card-art">🎈 1️⃣ 2️⃣ 3️⃣</div><h3>Ordena números</h3><p>Encuentra cuál número viene después.</p><button class="play" data-game="order">▶ Jugar</button></article>
- <article class="card"><span class="star">⭐</span><div class="card-art">🔴 ⭐ 🔺</div><h3>Formas divertidas</h3><p>Reconoce círculos, estrellas y triángulos.</p><button class="play" data-game="shapes">▶ Jugar</button></article>
- <article class="card"><span class="star">⭐</span><div class="card-art">🎨 🦁 🌈</div><h3>Colores y números</h3><p>Cuenta los colores y encuentra el que te piden.</p><button class="play" data-game="colors">▶ Jugar</button></article>
+ <article class="card"><span class="star">⭐</span><div class="card-art">🔴 ⭐ 🔺</div><h3>Formas divertidas</h3><p>Reconoce figuras geométricas según la edad.</p><button class="play" data-game="shapes">▶ Jugar</button></article>
+ <article class="card"><span class="star" id="card5Star">⭐</span><div class="card-art" id="card5Art">🎨 🦁 🌈</div><h3 id="card5Title">Colores y números</h3><p id="card5Desc">Cuenta los colores y encuentra el que te piden.</p><button class="play" data-game="colors">▶ Jugar</button></article>
 </section>
 <section class="achievements">
  <div class="ach-title"><span class="trophy">🏆</span><span>Tus logros<small style="display:block;font-size:11px;color:#6c83ab">¡Lo estás haciendo genial!</small></span></div>
@@ -91,7 +91,16 @@ h1{font-size:clamp(22px,3vw,34px);margin:0;font-weight:1000;letter-spacing:-1.2p
 const $=id=>document.getElementById(id);
 let age=3,stars=0,score=0,completed=0,round=0,currentGame='count',correct=null,locked=false,sound=true;
 const emojis=['🍎','🐥','⭐','🍓','🦋','🐸','🚗','🐠','🌼','🍪'];
-const shapes=[{e:'🔴',n:'círculo'},{e:'⭐',n:'estrella'},{e:'🔺',n:'triángulo'},{e:'🟦',n:'cuadrado'}];
+
+// Formas adaptadas según la edad (más variedad para 4 y 5 años)
+const allShapes=[
+  {e:'🔴',n:'círculo'},
+  {e:'🟦',n:'cuadrado'},
+  {e:'🔺',n:'triángulo'},
+  {e:'⭐',n:'estrella'},
+  {e:'🟩',n:'rectángulo'}
+];
+
 function rand(a,b){return Math.floor(Math.random()*(b-a+1))+a}
 
 function speak(t){
@@ -120,10 +129,31 @@ function updateStats(){
   if($('roundStat'))$('roundStat').textContent=`${completed}/10`;
   if($('levelLabel'))$('levelLabel').textContent=`Nivel ${age-2}`;
   if($('ageLabel'))$('ageLabel').textContent=`${age} años`;
-  if($('missionText'))$('missionText').textContent=age===3?'contar del 1 al 3':age===4?'contar del 1 al 6':'contar del 1 al 10';
+  if($('missionText')) {
+    if(age===3) $('missionText').textContent='contar del 1 al 3 y formas básicas';
+    else if(age===4) $('missionText').textContent='contar del 1 al 6 y secuencias';
+    else $('missionText').textContent='contar hasta 10 y sumas mágicas';
+  }
+
+  // Cambiar título de la tarjeta 5 si tiene 5 años (Suma mágica en vez de colores)
+  if(age===5){
+    $('card5Title').textContent='Suma mágica';
+    $('card5Desc').textContent='Suma dos grupos de frutas y halla el total.';$('card5Art').textContent='🍎 ➕ 🍎';
+  } else {
+    $('card5Title').textContent='Colores y números';
+    $('card5Desc').textContent='Cuenta los colores y encuentra el que te piden.';$('card5Art').textContent='🎨 🦁 🌈';
+  }
 }
+
 function maxN(){return age===3?3:age===4?6:10}
-function openGame(type){currentGame=type;round=0;$('modal').classList.add('show');newRound()}
+function openGame(type){
+  // Si es 5 años y pinchan colores, cambiamos a modo suma
+  if(type==='colors' && age===5) type='sum';
+  currentGame=type;
+  round=0;
+  $('modal').classList.add('show');
+  newRound();
+}
 
 function newRound(){
   locked=false;
@@ -132,19 +162,88 @@ function newRound(){
   $('feedback').className='feedback';$('nextBtn').classList.remove('show');
   $('options').innerHTML='';$('gameObjects').innerHTML='';
   
-  const max=maxN();let prompt='',hint='',icon='🧸',opts=[];
+  const max=maxN();
+  let prompt='',hint='',icon='🧸',opts=[];
+
   if(currentGame==='count'||currentGame==='howmany'){
-    const n=rand(1,max),e=emojis[rand(0,Math.min(emojis.length-1,age+3))];correct=n;prompt=currentGame==='count'?'¿Cuántos objetos hay?':'¡Ayuda a contar!';hint='Toca el número que muestra cuántos ves.';icon='🔎';
+    const n=rand(1,max), e=emojis[rand(0,Math.min(emojis.length-1, age+3))];
+    correct=n;
+    prompt=currentGame==='count'?'¿Cuántos objetos hay?':'¡Ayuda a contar!';
+    hint=age===3?'Cuenta despacio con tu dedo.':age===4?'¡Mira bien cuántos hay!':'¡Cuenta con atención todos los objetos!';
+    icon='🔎';
     for(let i=0;i<n;i++){let s=document.createElement('span');s.textContent=e;$('gameObjects').appendChild(s)}
     opts=makeOptions(n,max);
+
   }else if(currentGame==='order'){
-    let n=rand(1,Math.max(1,max-1));correct=n+1;prompt=`¿Qué número viene después del ${n}?`;hint='Piensa en la cuenta: uno, dos, tres…';icon='🎈';$('gameObjects').textContent=`${n}   ➜   ❓`;opts=makeOptions(correct,max);
+    // Para 3 años: números 1 a 2. Para 4: 1 a 5. Para 5: 1 a 9.
+    const limitMax = age===3 ? 2 : (age===4 ? 5 : 9);
+    let n=rand(1,limitMax);
+    correct=n+1;
+    prompt=`¿Qué número viene después del ${n}?`;
+    hint=age===3?'Piensa: uno, dos…':'Sigue la secuencia numérica.';
+    icon='🎈';
+    $('gameObjects').textContent=`${n}   ➜   ❓`;
+    opts=makeOptions(correct, age===3? 3 : (age===4? 6 : 10));
+
   }else if(currentGame==='shapes'){
-    const s=shapes[rand(0,age===3?2:3)];correct=s.n;prompt='¿Cómo se llama esta forma?';hint='¡Mira su figura con atención!';icon='🧩';$('gameObjects').textContent=s.e;opts=shuffle([s.n,...shapes.filter(x=>x.n!==s.n).sort(()=>Math.random()-.5).slice(0,2).map(x=>x.n)]);
-  }else{
-    const target=['rojo','azul','amarillo','verde'][rand(0,age===3?2:3)];const map={rojo:'🔴',azul:'🔵',amarillo:'🟡',verde:'🟢'};correct=target;prompt=`Toca el color ${target}`;hint='¡Encuentra el circulito del color indicado!';icon='🎨';$('gameObjects').textContent='🌈';opts=shuffle(Object.keys(map).slice(0,age===3?3:4));opts=opts.map(c=>({label:map[c],value:c}));
+    // 3 años: 3 formas (círculo, cuadrado, triángulo)
+    // 4 años: 4 formas (+ estrella)
+    // 5 años: 5 formas (+ rectángulo)
+    const shapeLimit = age===3 ? 3 : (age===4 ? 4 : 5);
+    const availableShapes = allShapes.slice(0, shapeLimit);
+    const s = availableShapes[rand(0, availableShapes.length-1)];
+    
+    correct=s.n;
+    prompt='¿Cómo se llama esta figura?';
+    hint='Observa sus esquinas y lados con atención.';
+    icon='🧩';
+    $('gameObjects').textContent=s.e;
+    
+    // Opciones basadas solo en las formas disponibles para esa edad
+    opts=shuffle([s.n, ...availableShapes.filter(x=>x.n!==s.n).map(x=>x.n)]).slice(0, age===3?2:3);
+    opts=shuffle(opts);
+
+  }else if(currentGame==='colors'){
+    // Modo colores para 3 y 4 años
+    const colorLimit = age===3 ? 3 : 4;
+    const target=['rojo','azul','amarillo','verde'][rand(0, colorLimit-1)];
+    const map={rojo:'🔴',azul:'🔵',amarillo:'🟡',verde:'🟢'};
+    correct=target;
+    prompt=`Toca el círculo de color ${target}`;
+    hint='Busca el color que te pide el enunciado.';
+    icon='🎨';
+    $('gameObjects').textContent='🌈';
+    let availableColors = Object.keys(map).slice(0, colorLimit);
+    opts=shuffle(availableColors).map(c=>({label:map[c],value:c}));
+
+  }else if(currentGame==='sum'){
+    // ¡NUEVO JUEGO EXCLUSIVO PARA 5 AÑOS: SUMAS FÁCILES!
+    const n1 = rand(1, 4);
+    const n2 = rand(1, 4);
+    correct = n1 + n2;
+    prompt = `¿Cuánto es ${n1} + ${n2}?`;
+    hint = 'Junta los dos grupos de frutas y cuenta el total.';
+    icon = '➕';
+    
+    // Mostrar visualmente las frutas sumándose
+    let container = document.createElement('div');
+    container.style.display = 'flex';
+    container.style.alignItems = 'center';
+    container.style.gap = '10px';
+    
+    let g1 = document.createElement('span'); g1.textContent = '🍎'.repeat(n1);
+    let plus = document.createElement('span'); plus.textContent = '➕'; plus.style.fontSize='24px';
+    let g2 = document.createElement('span'); g2.textContent = '🍎'.repeat(n2);
+    
+    container.appendChild(g1); container.appendChild(plus); container.appendChild(g2);
+    $('gameObjects').appendChild(container);
+
+    opts = makeOptions(correct, 10);
   }
-  $('gameTitle').textContent=prompt;$('gameHint').textContent=hint;$('gameIcon').textContent=icon;
+
+  $('gameTitle').textContent=prompt;
+  $('gameHint').textContent=hint;
+  $('gameIcon').textContent=icon;
 
   opts.forEach(item=>{
     const val=typeof item==='object'?item.value:item;
@@ -163,14 +262,29 @@ function newRound(){
   speak(prompt);
 }
 
-function makeOptions(n,max){let s=new Set([n]);while(s.size<Math.min(3,max))s.add(rand(1,max));return shuffle([...s])}
+function makeOptions(n,max){
+  let s=new Set([n]);
+  while(s.size < Math.min(3, max)) {
+    let r = rand(1, max);
+    s.add(r);
+  }
+  return shuffle([...s]);
+}
+
 function shuffle(a){return a.sort(()=>Math.random()-.5)}
 
 function choose(value,btn){
   if(locked)return;
   if(String(value)===String(correct)){
-    locked=true;stars++;score+=10;completed=Math.min(10,completed+1);round++;updateStats();
-    btn.style.background='#d9ffeb';btn.style.boxShadow='0 5px #91e4bd';
+    locked=true;
+    stars++;
+    score+=10;
+    completed=Math.min(10,completed+1);
+    round++;
+    updateStats();
+    
+    btn.style.background='#d9ffeb';
+    btn.style.boxShadow='0 5px #91e4bd';
     $('feedback').textContent=['¡Súper! ¡Lo hiciste! 🌟','¡Correcto, campeón! 🎉','¡Eres una estrella! 💖','¡Muy bien pensado! 🥳'][rand(0,3)];
     $('feedback').className='feedback good';$('options').querySelectorAll('button').forEach(b=>b.disabled=true);
     $('nextBtn').classList.add('show');$('nextBtn').textContent=round%5===0?'¡Celebrar! 🎉':'¡Siguiente reto! ➜';
@@ -194,7 +308,7 @@ document.querySelectorAll('.age').forEach(b=>{
     b.classList.add('active');
     age=Number(b.dataset.age);
     updateStats();
-    speak(`Nivel para ${age} años. ¡Vamos a jugar!`);
+    speak(`Nivel para ${age} años activado. ¡A jugar!`);
   });
 });
 
