@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dream Studio — Mi mundo creativo</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">🎨</div>
+      <div><h1>Dream Studio</h1><p>Tu pequeño universo creativo</p></div>
+    </div>
+    <div class="top-actions">
+      <button class="pill" id="newBtn">＋ Nuevo dibujo</button>
+      <button class="pill save" id="saveBtn">↓ Guardar obra</button>
+    </div>
+  </header>
+
+  <section class="welcome">
+    <div><div class="eyebrow">✦ Hoy es un buen día para crear</div><h2>¡Hola, artista! 💖</h2><p>Imagina algo mágico y dale vida con tus colores favoritos.</p></div>
+    <div class="mini-badge">🌈 Tu imaginación no tiene límites</div>
+  </section>
+
+  <main class="workspace">
+    <aside class="panel tools">
+      <div class="section-label">Tu caja de herramientas</div>
+      <div class="tool-grid">
+        <button class="tool active" data-tool="brush"><span class="emoji">🖌️</span><span>Pincel suave</span></button>
+        <button class="tool" data-tool="pencil"><span class="emoji">✏️</span><span>Lápiz</span></button>
+        <button class="tool" data-tool="marker"><span class="emoji">🖍️</span><span>Marcador</span></button>
+        <button class="tool" data-tool="eraser"><span class="emoji">🧽</span><span>Borrador</span></button>
+      </div>
+
+      <div class="section-label">Paleta de colores</div>
+      <div class="colors" id="colors">
+        <button class="swatch active" data-color="#ff76ad" style="background:#ff76ad" aria-label="Rosa"></button>
+        <button class="swatch" data-color="#9d83ff" style="background:#9d83ff" aria-label="Lila"></button>
+        <button class="swatch" data-color="#55cdb3" style="background:#55cdb3" aria-label="Menta"></button>
+        <button class="swatch" data-color="#ffb84d" style="background:#ffb84d" aria-label="Amarillo"></button>
+        <button class="swatch" data-color="#5c9dff" style="background:#5c9dff" aria-label="Azul"></button>
+        <button class="swatch" data-color="#ff806f" style="background:#ff806f" aria-label="Coral"></button>
+        <button class="swatch" data-color="#754fc4" style="background:#754fc4" aria-label="Morado"></button>
+        <button class="swatch" data-color="#5dba69" style="background:#5dba69" aria-label="Verde"></button>
+        <button class="swatch" data-color="#4a405c" style="background:#4a405c" aria-label="Ciruela oscuro"></button>
+        <button class="swatch" data-color="#ffffff" style="background:#fff" aria-label="Blanco"></button>
+      </div>
+      <div class="custom-color"><input type="color" id="customColor" value="#ff76ad"><label for="customColor">Inventar un color</label></div>
+
+      <div class="range-row"><label for="brushSize">Tamaño del trazo</label><span id="sizeValue">8 px</span></div>
+      <input type="range" id="brushSize" min="1" max="42" value="8">
+
+      <div class="section-label">Fondo del lienzo</div>
+      <div class="backgrounds">
+        <button class="bg-choice active" data-bg="#ffffff" style="background:#ffffff" aria-label="Blanco"></button>
+        <button class="bg-choice" data-bg="#fff1f7" style="background:#fff1f7" aria-label="Rosa pastel"></button>
+        <button class="bg-choice" data-bg="#f1efff" style="background:#f1efff" aria-label="Lila pastel"></button>
+        <button class="bg-choice" data-bg="#eafaff" style="background:#eafaff" aria-label="Azul pastel"></button>
+        <button class="bg-choice" data-bg="#effcf5" style="background:#effcf5" aria-label="Verde pastel"></button>
+        <button class="bg-choice" data-bg="gradient" style="background:linear-gradient(135deg,#fff0f7,#e9e4ff,#e3fbf4)" aria-label="Degradado"></button>
+      </div>
+
+      <div class="section-label">Pegatinas mágicas</div>
+      <div class="stickers" id="stickers">
+        <button class="sticker" data-sticker="⭐" title="Estrella">⭐</button>
+        <button class="sticker" data-sticker="💖" title="Corazón">💖</button>
+        <button class="sticker" data-sticker="🌸" title="Flor">🌸</button>
+        <button class="sticker" data-sticker="🦋" title="Mariposa">🦋</button>
+        <button class="sticker" data-sticker="🌈" title="Arcoíris">🌈</button>
+        <button class="sticker" data-sticker="☁️" title="Nube">☁️</button>
+        <button class="sticker" data-sticker="🍓" title="Fresa">🍓</button>
+        <button class="sticker" data-sticker="🐱" title="Gatito">🐱</button>
+        <button class="sticker" data-sticker="✨" title="Brillitos">✨</button>
+        <button class="sticker" data-sticker="🌙" title="Luna">🌙</button>
+      </div>
+
+      <div class="side-actions">
+        <button class="small-btn" id="undoBtn">↶ Deshacer</button>
+        <button class="small-btn" id="clearBtn">⌫ Limpiar lienzo</button>
+      </div>
+    </aside>
+
+    <section class="panel stage-panel">
+      <div class="stage-head">
+        <div><div class="stage-title">Mi lienzo mágico ✨</div><div class="stage-sub">Cada trazo es una nueva idea</div></div>
+        <div class="status">Listo para crear</div>
+      </div>
+      <div class="canvas-wrap" id="canvasWrap">
+        <canvas id="canvas" aria-label="Lienzo para dibujar"></canvas>
+        <div class="canvas-hint" id="canvasHint">Empieza a dibujar aquí · ¡Tu imaginación manda!</div>
+      </div>
+      <div class="stage-foot">
+        <span>💗 Hecho por ti, único en el mundo.</span>
+        <div class="shortcuts"><span class="shortcut">Ctrl + Z · Deshacer</span><span class="shortcut">PNG · Guardar</span></div>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="../js/script.js"></script>
+</body>
+</html>
