@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>PequeMates — Aventura de números</title>
 <style>
 :root{--navy:#153d82;--ink:#173b7a;--pink:#ff4f9a;--purple:#8757e9;--blue:#149be8;--green:#08b77b;--gold:#ffbf2e}
-*{box-sizing:border-box}body{margin:0;font-family:"Trebuchet MS",system-ui,sans-serif;color:var(--ink);background:#e9f8ff}
-button{font:inherit;cursor:pointer;border:0}
+*{box-sizing:border-box;user-select:none;-webkit-user-select:none;}
+body{margin:0;font-family:"Trebuchet MS",system-ui,sans-serif;color:var(--ink);background:#e9f8ff;overflow-x:hidden;}
+button{font:inherit;cursor:pointer;border:0;touch-action:manipulation;}
 .sky{min-height:100vh;background:linear-gradient(#69d0ff 0%,#b9efff 42%,#d8f8d5 43%,#9fe27f 100%);position:relative;overflow:hidden}
 .sky:before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 10% 5%,#fff9 0 7%,transparent 8%),radial-gradient(ellipse at 76% 11%,#fff9 0 5%,transparent 6%),radial-gradient(ellipse at 60% 24%,#fff7 0 4%,transparent 5%);pointer-events:none}
 .app{position:relative;max-width:1500px;margin:auto;padding:18px 28px 25px}
@@ -23,7 +25,8 @@ h1{font-size:clamp(22px,3vw,34px);margin:0;font-weight:1000;letter-spacing:-1.2p
 .speech:before{content:"";position:absolute;left:-13px;bottom:22px;width:28px;height:28px;background:white;transform:rotate(35deg)}
 .speech h2{font-size:clamp(22px,3vw,34px);margin:0 0 6px;color:#7449d5}.speech p{margin:0;font-size:clamp(13px,1.5vw,18px);font-weight:800;line-height:1.4}
 .mission{background:#a96526;color:white;padding:16px;border-radius:19px;border:4px solid #ffce77;box-shadow:0 6px 0 #824a20;text-align:center;transform:rotate(2deg);font-weight:900;font-size:17px}.mission span{display:block;font-size:30px;margin-bottom:4px}
-.agebar{display:flex;justify-content:center;gap:10px;margin-bottom:17px;flex-wrap:wrap}.age{padding:11px 20px;background:#fff;border:3px solid #fff;border-radius:17px;font-weight:1000;color:#5378b2;box-shadow:0 5px 0 #b6def5}.age.active{background:#11c79a;color:#fff;box-shadow:0 5px 0 #078d6d;border-color:#c4fff0}
+.agebar{display:flex;justify-content:center;gap:10px;margin-bottom:17px;flex-wrap:wrap}.age{padding:11px 20px;background:#fff;border:3px solid #fff;border-radius:17px;font-weight:1000;color:#5378b2;box-shadow:0 5px 0 #b6def5}
+.age.active{background:#11c79a;color:#fff;box-shadow:0 5px 0 #078d6d;border-color:#c4fff0}
 .cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:13px}
 .card{background:#fff;border:4px solid white;border-radius:27px;padding:12px 12px 14px;text-align:center;box-shadow:0 8px 0 #4b9c5a55;display:flex;flex-direction:column;min-width:0;position:relative;transition:transform .18s}
 .card:hover{transform:translateY(-6px) rotate(-.5deg)}.card:nth-child(1){background:#fff0f8}.card:nth-child(2){background:#fff8d9}.card:nth-child(3){background:#e9f8ff}.card:nth-child(4){background:#f2eaff}.card:nth-child(5){background:#e4fff4}
@@ -39,7 +42,8 @@ h1{font-size:clamp(22px,3vw,34px);margin:0;font-weight:1000;letter-spacing:-1.2p
 @media(max-width:390px){.cards{grid-template-columns:1fr}.card{display:grid;grid-template-columns:95px 1fr;column-gap:10px;text-align:left}.card-art{grid-row:1/4;height:100%;min-height:100px;margin:0}.card h3{align-self:end}.card p{min-height:0}.play{grid-column:2;text-align:center}.star{font-size:18px}}
 </style>
 </head>
-<body><div class="sky"><div class="app">
+<body>
+<div class="sky"><div class="app">
 <header>
  <div class="brand"><div class="logo">⭐</div><div><h1>PequeMates</h1><small>¡Aprender también es divertido!</small></div></div>
  <div class="header-right">
@@ -68,9 +72,20 @@ h1{font-size:clamp(22px,3vw,34px);margin:0;font-weight:1000;letter-spacing:-1.2p
  <div class="encourage"><span>🌈☁️</span>¡Sigue así,<br>pequeño genio!</div>
 </section>
 </div></div>
-<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="gameTitle"><div class="gamebox">
-<button class="close" id="closeBtn" aria-label="Cerrar">×</button><div style="font-size:40px" id="gameIcon">🧸</div><h2 id="gameTitle">¡Vamos a jugar!</h2><div class="hint" id="gameHint">Cuenta con calma.</div><div class="game-objects" id="gameObjects"></div><div class="options" id="options"></div><div class="feedback" id="feedback" aria-live="polite"></div><button class="next" id="nextBtn">¡Siguiente reto! ➜</button>
-</div></div>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="gameTitle">
+  <div class="gamebox">
+    <button class="close" id="closeBtn" aria-label="Cerrar">×</button>
+    <div style="font-size:40px" id="gameIcon">🧸</div>
+    <h2 id="gameTitle">¡Vamos a jugar!</h2>
+    <div class="hint" id="gameHint">Cuenta con calma.</div>
+    <div class="game-objects" id="gameObjects"></div>
+    <div class="options" id="options"></div>
+    <div class="feedback" id="feedback" aria-live="polite"></div>
+    <button class="next" id="nextBtn">¡Siguiente reto! ➜</button>
+  </div>
+</div>
+
 <script>
 (()=>{
 const $=id=>document.getElementById(id);
@@ -78,44 +93,138 @@ let age=3,stars=0,score=0,completed=0,round=0,currentGame='count',correct=null,l
 const emojis=['🍎','🐥','⭐','🍓','🦋','🐸','🚗','🐠','🌼','🍪'];
 const shapes=[{e:'🔴',n:'círculo'},{e:'⭐',n:'estrella'},{e:'🔺',n:'triángulo'},{e:'🟦',n:'cuadrado'}];
 function rand(a,b){return Math.floor(Math.random()*(b-a+1))+a}
-function speak(t){if(!sound||!('speechSynthesis'in window))return;speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(t);u.lang='es-CO';u.rate=.88;u.pitch=1.18;speechSynthesis.speak(u)}
-function updateStats(){$('totalStars').textContent=stars;$('scoreStat').textContent=score;$('roundStat').textContent=`${completed}/10`;$('levelLabel').textContent=`Nivel ${age-2}`;$('ageLabel').textContent=`${age} años`;$('missionText').textContent=age===3?'contar del 1 al 3':age===4?'contar del 1 al 6':'contar del 1 al 10'}
+
+function speak(t){
+  if(!sound||!('speechSynthesis'in window))return;
+  speechSynthesis.cancel();
+  let u=new SpeechSynthesisUtterance(t);
+  u.lang='es-ES';
+  u.rate=0.9;
+  u.pitch=1.3;
+  
+  let voices=speechSynthesis.getVoices();
+  let spanishVoices=voices.filter(v=>v.lang.startsWith('es'));
+  let femaleVoice=spanishVoices.find(v=> 
+    v.name.includes('Helena')||v.name.includes('Monica')||v.name.includes('Paulina')||v.name.includes('Sabina')||v.name.includes('Google español')||v.name.toLowerCase().includes('female')
+  );
+  if(femaleVoice) u.voice=femaleVoice;
+  else if(spanishVoices.length>0) u.voice=spanishVoices[0];
+
+  speechSynthesis.speak(u);
+}
+if('speechSynthesis'in window){speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices()}
+
+function updateStats(){
+  $('totalStars').textContent=stars;
+  $('scoreStat').textContent=score;
+  $('roundStat').textContent=`${completed}/10`;
+  $('levelLabel').textContent=`Nivel ${age-2}`;
+  $('ageLabel').textContent=`${age} años`;
+  $('missionText').textContent=age===3?'contar del 1 al 3':age===4?'contar del 1 al 6':'contar del 1 al 10';
+}
 function maxN(){return age===3?3:age===4?6:10}
 function openGame(type){currentGame=type;round=0;$('modal').classList.add('show');newRound()}
+
 function newRound(){
- locked=false;correct=null;$('feedback').textContent='';$('feedback').className='feedback';$('nextBtn').classList.remove('show');$('options').innerHTML='';$('gameObjects').innerHTML='';
- const max=maxN();let prompt='',hint='',icon='🧸',opts=[];
- if(currentGame==='count'||currentGame==='howmany'){
-  const n=rand(1,max),e=emojis[rand(0,Math.min(emojis.length-1,age+3))];correct=n;prompt=currentGame==='count'?'¿Cuántos objetos hay?':'¡Ayuda a contar!';hint='Toca el número que muestra cuántos ves.';icon='🔎';
-  for(let i=0;i<n;i++){let s=document.createElement('span');s.textContent=e;$('gameObjects').appendChild(s)}
-  opts=makeOptions(n,max);
- }else if(currentGame==='order'){
-  let n=rand(1,Math.max(1,max-1));correct=n+1;prompt=`¿Qué número viene después del ${n}?`;hint='Piensa en la cuenta: uno, dos, tres…';icon='🎈';$('gameObjects').textContent=`${n}   ➜   ❓`;opts=makeOptions(correct,max);
- }else if(currentGame==='shapes'){
-  const s=shapes[rand(0,age===3?2:3)];correct=s.n;prompt='¿Cómo se llama esta forma?';hint='¡Mira su figura con atención!';icon='🧩';$('gameObjects').textContent=s.e;opts=shuffle([s.n,...shapes.filter(x=>x.n!==s.n).sort(()=>Math.random()-.5).slice(0,2).map(x=>x.n)]);
- }else{
-  const target=['rojo','azul','amarillo','verde'][rand(0,age===3?2:3)];const map={rojo:'🔴',azul:'🔵',amarillo:'🟡',verde:'🟢'};correct=target;prompt=`Toca el color ${target}`;hint='¡Encuentra el circulito del color indicado!';icon='🎨';$('gameObjects').textContent='🌈';opts=shuffle(Object.keys(map).slice(0,age===3?3:4));opts=opts.map(c=>({label:map[c],value:c}));
- }
- $('gameTitle').textContent=prompt;$('gameHint').textContent=hint;$('gameIcon').textContent=icon;
- opts.forEach(item=>{const val=typeof item==='object'?item.value:item;const label=typeof item==='object'?item.label:item;const b=document.createElement('button');b.className='option';b.textContent=label;b.addEventListener('click',()=>choose(val,b));$('options').appendChild(b)});
- speak(prompt);
+  locked=false;
+  correct=null;
+  $('feedback').textContent='';
+  $('feedback').className='feedback';$('nextBtn').classList.remove('show');
+  $('options').innerHTML='';$('gameObjects').innerHTML='';
+  
+  const max=maxN();let prompt='',hint='',icon='🧸',opts=[];
+  if(currentGame==='count'||currentGame==='howmany'){
+    const n=rand(1,max),e=emojis[rand(0,Math.min(emojis.length-1,age+3))];correct=n;prompt=currentGame==='count'?'¿Cuántos objetos hay?':'¡Ayuda a contar!';hint='Toca el número que muestra cuántos ves.';icon='🔎';
+    for(let i=0;i<n;i++){let s=document.createElement('span');s.textContent=e;$('gameObjects').appendChild(s)}
+    opts=makeOptions(n,max);
+  }else if(currentGame==='order'){
+    let n=rand(1,Math.max(1,max-1));correct=n+1;prompt=`¿Qué número viene después del ${n}?`;hint='Piensa en la cuenta: uno, dos, tres…';icon='🎈';$('gameObjects').textContent=`${n}   ➜   ❓`;opts=makeOptions(correct,max);
+  }else if(currentGame==='shapes'){
+    const s=shapes[rand(0,age===3?2:3)];correct=s.n;prompt='¿Cómo se llama esta forma?';hint='¡Mira su figura con atención!';icon='🧩';$('gameObjects').textContent=s.e;opts=shuffle([s.n,...shapes.filter(x=>x.n!==s.n).sort(()=>Math.random()-.5).slice(0,2).map(x=>x.n)]);
+  }else{
+    const target=['rojo','azul','amarillo','verde'][rand(0,age===3?2:3)];const map={rojo:'🔴',azul:'🔵',amarillo:'🟡',verde:'🟢'};correct=target;prompt=`Toca el color ${target}`;hint='¡Encuentra el circulito del color indicado!';icon='🎨';$('gameObjects').textContent='🌈';opts=shuffle(Object.keys(map).slice(0,age===3?3:4));opts=opts.map(c=>({label:map[c],value:c}));
+  }
+  $('gameTitle').textContent=prompt;$('gameHint').textContent=hint;$('gameIcon').textContent=icon;
+
+  opts.forEach(item=>{
+    const val=typeof item==='object'?item.value:item;
+    const label=typeof item==='object'?item.label:item;
+    const b=document.createElement('button');
+    b.className='option';
+    b.textContent=label;
+    
+    const handleChoice = (e)=>{
+      e.preventDefault();
+      choose(val, b);
+    };
+    b.addEventListener('click', handleChoice);
+    b.addEventListener('touchend', handleChoice);
+
+    $('options').appendChild(b);
+  });
+  speak(prompt);
 }
+
 function makeOptions(n,max){let s=new Set([n]);while(s.size<Math.min(3,max))s.add(rand(1,max));return shuffle([...s])}
 function shuffle(a){return a.sort(()=>Math.random()-.5)}
+
 function choose(value,btn){
- if(locked)return;
- if(String(value)===String(correct)){
-  locked=true;stars++;score+=10;completed=Math.min(10,completed+1);round++;updateStats();btn.style.background='#d9ffeb';btn.style.boxShadow='0 5px #91e4bd';$('feedback').textContent=['¡Súper! ¡Lo hiciste! 🌟','¡Correcto, campeón! 🎉','¡Eres una estrella! 💖','¡Muy bien pensado! 🥳'][rand(0,3)];$('feedback').className='feedback good';$('options').querySelectorAll('button').forEach(b=>b.disabled=true);$('nextBtn').classList.add('show');$('nextBtn').textContent=round%5===0?'¡Celebrar! 🎉':'¡Siguiente reto! ➜';speak('¡Muy bien! ¡Lo hiciste genial!');
- }else{$('feedback').textContent='¡Inténtalo otra vez! Tú puedes 💪';$('feedback').className='feedback bad';btn.animate([{transform:'translateX(0)'},{transform:'translateX(-5px)'},{transform:'translateX(5px)'},{transform:'translateX(0)'}],{duration:220});speak('Casi. Prueba otra vez.')}
+  if(locked)return;
+  if(String(value)===String(correct)){
+    locked=true;stars++;score+=10;completed=Math.min(10,completed+1);round++;updateStats();
+    btn.style.background='#d9ffeb';btn.style.boxShadow='0 5px #91e4bd';
+    $('feedback').textContent=['¡Súper! ¡Lo hiciste! 🌟','¡Correcto, campeón! 🎉','¡Eres una estrella! 💖','¡Muy bien pensado! 🥳'][rand(0,3)];
+    $('feedback').className='feedback good';$('options').querySelectorAll('button').forEach(b=>b.disabled=true);
+    $('nextBtn').classList.add('show');$('nextBtn').textContent=round%5===0?'¡Celebrar! 🎉':'¡Siguiente reto! ➜';
+    speak('¡Muy bien! ¡Lo hiciste genial!');
+  }else{
+    $('feedback').textContent='¡Inténtalo otra vez! Tú puedes 💪';
+    $('feedback').className='feedback bad';
+    btn.animate([{transform:'translateX(0)'},{transform:'translateX(-5px)'},{transform:'translateX(5px)'},{transform:'translateX(0)'}],{duration:220});
+    speak('Casi. Prueba otra vez.');
+  }
 }
-document.querySelectorAll('.play').forEach(b=>b.addEventListener('click',()=>openGame(b.dataset.game)));
-document.querySelectorAll('.age').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.age').forEach(x=>x.classList.remove('active'));b.classList.add('active');age=Number(b.dataset.age);updateStats();speak(`Nivel para ${age} años. ¡Vamos a jugar!`)}));
-$('nextBtn').addEventListener('click',()=>{newRound()});
-$('closeBtn').addEventListener('click',()=>{$('modal').classList.remove('show');if('speechSynthesis'in window)speechSynthesis.cancel()});
+
+document.querySelectorAll('.play').forEach(b=>{
+  const startPlay = (e)=>{e.preventDefault();openGame(b.dataset.game)};
+  b.addEventListener('click', startPlay);
+  b.addEventListener('touchend', startPlay);
+});
+
+document.querySelectorAll('.age').forEach(b=>{
+  const changeAge = (e)=>{
+    e.preventDefault();
+    document.querySelectorAll('.age').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    age=Number(b.dataset.age);
+    updateStats();
+    speak(`Nivel para ${age} años. ¡Vamos a jugar!`);
+  };
+  b.addEventListener('click', changeAge);
+  b.addEventListener('touchend', changeAge);
+});
+
+const nextHandler = (e)=>{e.preventDefault();newRound();};
+$('nextBtn').addEventListener('click', nextHandler);$('nextBtn').addEventListener('touchend', nextHandler);
+
+const closeHandler = (e)=>{e.preventDefault();$('modal').classList.remove('show');if('speechSynthesis'in window)speechSynthesis.cancel();};
+$('closeBtn').addEventListener('click', closeHandler);$('closeBtn').addEventListener('touchend', closeHandler);
+
 $('modal').addEventListener('click',e=>{if(e.target===$('modal'))$('closeBtn').click()});
-$('soundBtn').addEventListener('click',()=>{sound=!sound;$('soundBtn').textContent=sound?'🔊':'🔇';if(!sound&&'speechSynthesis'in window)speechSynthesis.cancel();else speak('¡Hola, vamos a jugar!')});
+
+const soundHandler = (e)=>{
+  e.preventDefault();
+  sound=!sound;
+  $('soundBtn').textContent=sound?'🔊':'🔇';
+  if(!sound&&'speechSynthesis'in window)speechSynthesis.cancel();
+  else speak('¡Hola, vamos a jugar!');
+};
+$('soundBtn').addEventListener('click', soundHandler);$('soundBtn').addEventListener('touchend', soundHandler);
+
 document.addEventListener('keydown',e=>{if(e.key==='Escape')$('closeBtn').click()});
 updateStats();
 })();
 </script>
-</body></html>
+
+</body>
+</html>
