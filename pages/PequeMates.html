@@ -115,12 +115,12 @@ function speak(t){
 if('speechSynthesis'in window){speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices()}
 
 function updateStats(){
-  $('totalStars').textContent=stars;
-  $('scoreStat').textContent=score;
-  $('roundStat').textContent=`${completed}/10`;
-  $('levelLabel').textContent=`Nivel ${age-2}`;
-  $('ageLabel').textContent=`${age} años`;
-  $('missionText').textContent=age===3?'contar del 1 al 3':age===4?'contar del 1 al 6':'contar del 1 al 10';
+  if($('totalStars'))$('totalStars').textContent=stars;
+  if($('scoreStat'))$('scoreStat').textContent=score;
+  if($('roundStat'))$('roundStat').textContent=`${completed}/10`;
+  if($('levelLabel'))$('levelLabel').textContent=`Nivel ${age-2}`;
+  if($('ageLabel'))$('ageLabel').textContent=`${age} años`;
+  if($('missionText'))$('missionText').textContent=age===3?'contar del 1 al 3':age===4?'contar del 1 al 6':'contar del 1 al 10';
 }
 function maxN(){return age===3?3:age===4?6:10}
 function openGame(type){currentGame=type;round=0;$('modal').classList.add('show');newRound()}
