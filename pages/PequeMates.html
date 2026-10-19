@@ -90,9 +90,9 @@ h1{font-size:clamp(22px,3vw,34px);margin:0;font-weight:1000;letter-spacing:-1.2p
 (()=>{
 const $=id=>document.getElementById(id);
 let age=3,stars=0,score=0,completed=0,round=0,currentGame='count',correct=null,locked=false,sound=true;
-const emojis=['🍎','🐥','⭐','🍓','🦋','🐸','🚗','🐠','🌼','🍪'];
+let audioInitialized=false; // Bandera para desbloquear el audio en móviles con el primer toque
 
-// NUEVO: Relacionar figura geométrica con objeto real (sin texto)
+const emojis=['🍎','🐥','⭐','🍓','🦋','🐸','🚗','🐠','🌼','🍪'];
 const shapePairs = [
   { shape: '⚽', name: 'círculo', real: '⚽' },
   { shape: '🍕', name: 'triángulo', real: '🍕' },
@@ -105,6 +105,14 @@ function rand(a,b){return Math.floor(Math.random()*(b-a+1))+a}
 
 function speak(t){
   if(!sound||!('speechSynthesis'in window))return;
+  
+  // Si el navegador bloquea por políticas de autoplay, esto asegura que despierte
+  if(!audioInitialized) {
+    let dummy = new SpeechSynthesisUtterance('');
+    speechSynthesis.speak(dummy);
+    audioInitialized = true;
+  }
+
   speechSynthesis.cancel();
   let u=new SpeechSynthesisUtterance(t);
   u.lang='es-ES';
@@ -121,7 +129,19 @@ function speak(t){
 
   speechSynthesis.speak(u);
 }
-if('speechSynthesis'in window){speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices()}
+
+if('speechSynthesis'in window){
+  speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices();
+}
+
+// Desbloquear audio automáticamente con cualquier toque inicial en la pantalla
+document.addEventListener('pointerdown', () => {
+  if(!audioInitialized && 'speechSynthesis' in window) {
+    let dummy = new SpeechSynthesisUtterance('');
+    speechSynthesis.speak(dummy);
+    audioInitialized = true;
+  }
+}, { once: true });
 
 function updateStats(){
   if($('totalStars'))$('totalStars').textContent=stars;
@@ -183,20 +203,17 @@ function newRound(){
     opts=makeOptions(correct, age===3? 3 : (age===4? 6 : 10));
 
   }else if(currentGame==='shapes'){
-    // NUEVA DINÁMICA VISUAL: Mostrar un objeto real y buscar qué figura tiene su forma (sin texto)
     const limitPairs = age===3 ? 3 : (age===4 ? 4 : 5);
     const availablePairs = shapePairs.slice(0, limitPairs);
     const targetPair = availablePairs[rand(0, availablePairs.length - 1)];
     
-    correct = targetPair.shape; // La respuesta correcta es la figura geométrica emoji
+    correct = targetPair.shape;
     prompt = `¿Qué figura tiene la forma de esto?`;
     hint = 'Toca la figura geométrica que coincide con el objeto.';
     icon = '🧩';
     
-    // Mostramos el objeto real arriba (ej: una pizza o un balón)
     $('gameObjects').textContent = targetPair.real;
     
-    // Las opciones son figuras geométricas puras (emojis)
     opts = shuffle(availablePairs.map(p => p.shape)).slice(0, age===3 ? 2 : 3);
     if(!opts.includes(correct)){
       opts[0] = correct;
@@ -256,7 +273,9 @@ function newRound(){
 
     $('options').appendChild(b);
   });
-  speak(prompt);
+  
+  // Asegurar lectura inmediata al abrir cualquier modo
+  setTimeout(() => speak(prompt), 250);
 }
 
 function makeOptions(n,max){
