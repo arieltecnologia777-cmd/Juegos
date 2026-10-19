@@ -62,7 +62,7 @@ h1{font-size:clamp(22px,3vw,34px);margin:0;font-weight:1000;letter-spacing:-1.2p
  <article class="card"><span class="star">⭐</span><div class="card-art">🍎 🔢 🍎</div><h3>Cuenta y elige</h3><p>Cuenta los objetos y toca el número correcto.</p><button class="play" data-game="count">▶ Jugar</button></article>
  <article class="card"><span class="star">⭐</span><div class="card-art">🐻 🐻 🐻</div><h3>¿Cuántos hay?</h3><p>¡Mira con atención y descubre cuántos ves!</p><button class="play" data-game="howmany">▶ Jugar</button></article>
  <article class="card"><span class="star">⭐</span><div class="card-art">🎈 1️⃣ 2️⃣ 3️⃣</div><h3>Ordena números</h3><p>Encuentra cuál número viene después.</p><button class="play" data-game="order">▶ Jugar</button></article>
- <article class="card"><span class="star">⭐</span><div class="card-art">⚽ 🍕 🪟</div><h3>Formas y objetos</h3><p>Empareja cada figura con su objeto real.</p><button class="play" data-game="shapes">▶ Jugar</button></article>
+ <article class="card"><span class="star">⭐</span><div class="card-art">⚽ 🍕 🪟</div><h3>Formas y objetos</h3><p>Relaciona objetos reales con su figura geométrica.</p><button class="play" data-game="shapes">▶ Jugar</button></article>
  <article class="card"><span class="star" id="card5Star">⭐</span><div class="card-art" id="card5Art">🎨 🦁 🌈</div><h3 id="card5Title">Colores y números</h3><p id="card5Desc">Cuenta los colores y encuentra el que te piden.</p><button class="play" data-game="colors">▶ Jugar</button></article>
 </section>
 <section class="achievements">
@@ -90,29 +90,29 @@ h1{font-size:clamp(22px,3vw,34px);margin:0;font-weight:1000;letter-spacing:-1.2p
 (()=>{
 const $=id=>document.getElementById(id);
 let age=3,stars=0,score=0,completed=0,round=0,currentGame='count',correct=null,locked=false,sound=true;
-let audioInitialized=false; // Bandera para desbloquear el audio en móviles con el primer toque
+let audioInitialized=false;
 
 const emojis=['🍎','🐥','⭐','🍓','🦋','🐸','🚗','🐠','🌼','🍪'];
-const shapePairs = [
-  { shape: '⚽', name: 'círculo', real: '⚽' },
-  { shape: '🍕', name: 'triángulo', real: '🍕' },
-  { shape: '🪟', name: 'cuadrado', real: '🪟' },
-  { shape: '⭐', name: 'estrella', real: '⭐' },
-  { shape: '🚪', name: 'rectángulo', real: '🚪' }
+
+// Relación correcta: Objeto real de arriba -> Figura geométrica correcta abajo
+const shapeAssociations = [
+  { real: '⚽', shape: '🔴', name: 'círculo' },    // Pelota -> Círculo
+  { real: '🍕', shape: '🔺', name: 'triángulo' },  // Pizza -> Triángulo
+  { real: '🪟', shape: '🟦', name: 'cuadrado' },   // Ventana -> Cuadrado
+  { real: '🚪', shape: '🟩', name: 'rectángulo' }  // Puerta -> Rectángulo
 ];
+
+const pureShapes = ['🔴', '🔺', '🟦', '🟩'];
 
 function rand(a,b){return Math.floor(Math.random()*(b-a+1))+a}
 
 function speak(t){
   if(!sound||!('speechSynthesis'in window))return;
-  
-  // Si el navegador bloquea por políticas de autoplay, esto asegura que despierte
   if(!audioInitialized) {
     let dummy = new SpeechSynthesisUtterance('');
     speechSynthesis.speak(dummy);
     audioInitialized = true;
   }
-
   speechSynthesis.cancel();
   let u=new SpeechSynthesisUtterance(t);
   u.lang='es-ES';
@@ -134,7 +134,6 @@ if('speechSynthesis'in window){
   speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices();
 }
 
-// Desbloquear audio automáticamente con cualquier toque inicial en la pantalla
 document.addEventListener('pointerdown', () => {
   if(!audioInitialized && 'speechSynthesis' in window) {
     let dummy = new SpeechSynthesisUtterance('');
@@ -203,21 +202,22 @@ function newRound(){
     opts=makeOptions(correct, age===3? 3 : (age===4? 6 : 10));
 
   }else if(currentGame==='shapes'){
-    const limitPairs = age===3 ? 3 : (age===4 ? 4 : 5);
-    const availablePairs = shapePairs.slice(0, limitPairs);
+    // Reto de formas: Arriba sale un objeto de la vida real, abajo se buscan las figuras geométricas correspondientes
+    const limitPairs = age===3 ? 3 : (age===4 ? 4 : 4);
+    const availablePairs = shapeAssociations.slice(0, limitPairs);
     const targetPair = availablePairs[rand(0, availablePairs.length - 1)];
     
-    correct = targetPair.shape;
-    prompt = `¿Qué figura tiene la forma de esto?`;
-    hint = 'Toca la figura geométrica que coincide con el objeto.';
+    correct = targetPair.shape; // La respuesta correcta es la figura geométrica pura
+    prompt = `¿Qué figura geométrica se parece a esto?`;
+    hint = 'Busca la figura que tiene su misma forma.';
     icon = '🧩';
     
+    // Objeto real arriba
     $('gameObjects').textContent = targetPair.real;
     
-    opts = shuffle(availablePairs.map(p => p.shape)).slice(0, age===3 ? 2 : 3);
-    if(!opts.includes(correct)){
-      opts[0] = correct;
-    }
+    // Opciones: figuras geométricas diferentes
+    let wrongShapes = pureShapes.filter(s => s !== correct);
+    opts = shuffle([correct, ...shuffle(wrongShapes).slice(0, age===3 ? 1 : 2)]);
     opts = shuffle(opts);
 
   }else if(currentGame==='colors'){
@@ -274,7 +274,6 @@ function newRound(){
     $('options').appendChild(b);
   });
   
-  // Asegurar lectura inmediata al abrir cualquier modo
   setTimeout(() => speak(prompt), 250);
 }
 
