@@ -1,187 +1,121 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PequeMates — Juego de números</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PequeMates — Aventura de números</title>
 <style>
-:root{--ink:#293653;--muted:#7b86a1;--purple:#8167e8;--pink:#ff8db5;--yellow:#ffd66b;--mint:#82dfc2;--blue:#83caff;--paper:#fff;--line:#ecebfa}
-*{box-sizing:border-box}
-body{margin:0;background:radial-gradient(circle at 0 0,#fff0f6,transparent 28%),radial-gradient(circle at 100% 0,#e8f8ff,transparent 30%),#f5f5ff;color:var(--ink);font-family:"Trebuchet MS",ui-rounded,system-ui,sans-serif}
+:root{--navy:#153d82;--ink:#173b7a;--pink:#ff4f9a;--purple:#8757e9;--blue:#149be8;--green:#08b77b;--gold:#ffbf2e}
+*{box-sizing:border-box}body{margin:0;font-family:"Trebuchet MS",system-ui,sans-serif;color:var(--ink);background:#e9f8ff}
 button{font:inherit;cursor:pointer;border:0}
-.app{max-width:1120px;margin:auto;padding:22px}
-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
-.brand{display:flex;align-items:center;gap:12px}.logo{height:52px;width:52px;border-radius:18px;background:linear-gradient(135deg,#ffb2d0,#b9a8ff);display:grid;place-items:center;font-size:28px;box-shadow:0 7px 18px #b9a8ff55}
-h1{font-size:25px;letter-spacing:-.8px;margin:0;font-weight:900}.subtitle{color:var(--muted);font-size:12px;margin-top:3px}
-.sound{background:#fff;border:1px solid var(--line);border-radius:99px;padding:10px 14px;color:var(--ink);font-weight:800}
-.hero{border-radius:28px;background:linear-gradient(115deg,#fff 0%,#fff2f8 55%,#f0ecff 100%);padding:22px 25px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:15px;box-shadow:0 12px 35px #6e60a10d;border:1px solid white}
-.hero h2{font-size:clamp(22px,4vw,32px);margin:0 0 7px;letter-spacing:-.8px}.hero p{margin:0;color:var(--muted);font-size:14px;line-height:1.5}.hero-art{font-size:clamp(42px,7vw,68px);white-space:nowrap;filter:drop-shadow(0 5px 5px #d4bce855)}
-.levels{display:flex;gap:9px;margin-bottom:18px;flex-wrap:wrap}
-.level{background:#fff;border:2px solid transparent;padding:10px 16px;border-radius:15px;font-size:13px;font-weight:900;color:var(--muted);box-shadow:0 5px 16px #6e60a10a}
-.level.active{border-color:#b7a6ff;background:#f1edff;color:#6f56cf}
-.game{background:#fff;border:1px solid white;border-radius:28px;padding:clamp(17px,3vw,30px);box-shadow:0 15px 45px #6555a110;text-align:center}
-.game-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:20px}
-.progress{height:9px;border-radius:99px;background:#f0edfb;flex:1;overflow:hidden}.progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,#a99aff,#ff9fc6);border-radius:99px;transition:width .35s}
-.score{font-size:12px;font-weight:900;background:#fff7d9;padding:9px 12px;border-radius:99px;white-space:nowrap}
-.instruction{font-size:clamp(21px,4vw,30px);font-weight:900;line-height:1.25;margin:10px auto 8px;max-width:650px}
-.subinstruction{font-size:14px;color:var(--muted);margin:0 0 18px}
-.objects{min-height:135px;display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:9px;margin:8px auto 22px;max-width:700px}
-.object{font-size:clamp(34px,6vw,53px);animation:pop .25s ease-out;filter:drop-shadow(0 3px 1px #00000008)}
-@keyframes pop{from{transform:scale(.6);opacity:.3}to{transform:scale(1);opacity:1}}
-.answers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;max-width:650px;margin:0 auto}
-.answer{min-height:88px;border-radius:22px;background:#f5f2ff;border:3px solid transparent;color:#54469c;font-size:clamp(26px,5vw,38px);font-weight:1000;box-shadow:0 5px 0 #e4dcff;transition:transform .15s,background .15s}
-.answer:nth-child(2){background:#fff1f7;color:#b74f80;box-shadow:0 5px 0 #ffdfeb}
-.answer:nth-child(3){background:#eafaf4;color:#348b75;box-shadow:0 5px 0 #d1f2e5}
-.answer:hover{transform:translateY(-3px)}.answer:active{transform:translateY(2px);box-shadow:none}
-.answer.correct{background:#dcf9e9!important;border-color:#60c995!important;color:#267d51!important;box-shadow:0 5px 0 #b8ebce!important}
-.answer.wrong{background:#fff0f0!important;border-color:#ffaaa9!important;color:#b44d4d!important;box-shadow:0 5px 0 #ffd7d7!important}
-.feedback{min-height:34px;margin:18px auto 3px;font-weight:900;font-size:17px}.feedback.good{color:#25966c}.feedback.try{color:#b87b30}
-.next{display:none;margin:8px auto 0;padding:14px 24px;border-radius:15px;background:var(--purple);color:#fff;font-weight:900;box-shadow:0 5px 0 #6650c5}.next.show{display:inline-block}
-.footer{display:flex;justify-content:center;gap:8px;align-items:center;text-align:center;color:var(--muted);font-size:12px;margin:16px 0 5px}
-.finish{display:none;text-align:center;padding:20px 8px}.finish.show{display:block}.finish .big{font-size:65px}.finish h2{font-size:29px;margin:10px}.finish p{color:var(--muted)}.restart{padding:14px 24px;border-radius:15px;background:#ff91b8;color:#fff;font-weight:900;box-shadow:0 5px 0 #e56f9b}
-@media(max-width:540px){.app{padding:13px}.hero{padding:19px}.hero-art{font-size:40px}.game{padding:15px}.answers{gap:8px}.answer{min-height:74px;border-radius:17px}.objects{min-height:115px}.level{flex:1;padding:10px 8px}.brand h1{font-size:22px}}
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.sky{min-height:100vh;background:linear-gradient(#69d0ff 0%,#b9efff 42%,#d8f8d5 43%,#9fe27f 100%);position:relative;overflow:hidden}
+.sky:before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 10% 5%,#fff9 0 7%,transparent 8%),radial-gradient(ellipse at 76% 11%,#fff9 0 5%,transparent 6%),radial-gradient(ellipse at 60% 24%,#fff7 0 4%,transparent 5%);pointer-events:none}
+.app{position:relative;max-width:1500px;margin:auto;padding:18px 28px 25px}
+header{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:15px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px;background:#fff;border-radius:24px;padding:9px 19px 9px 12px;box-shadow:0 6px 0 #c4e8ff}
+.logo{width:54px;height:54px;border-radius:18px;display:grid;place-items:center;font-size:34px;background:#ffcf4d;box-shadow:inset 0 -5px #f6a824}
+h1{font-size:clamp(22px,3vw,34px);margin:0;font-weight:1000;letter-spacing:-1.2px;color:#208be5;text-shadow:1px 2px #c8efff}.brand small{font-size:12px;font-weight:800;color:#2253a0;display:block}
+.header-right{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.badge{display:flex;align-items:center;gap:9px;background:#ffffffed;border:2px solid #fff;border-radius:50px;padding:9px 17px;font-weight:900;box-shadow:0 5px 0 #a9ddf8}.badge .avatar{font-size:29px}.badge small{display:block;font-size:11px;color:#6280ad;margin-top:2px}
+.round-btn{width:49px;height:49px;border-radius:50%;background:#8757e9;color:white;font-size:24px;box-shadow:0 5px 0 #633bc4}
+.hero{display:grid;grid-template-columns:230px minmax(0,1fr) 210px;gap:15px;align-items:center;margin:10px 0 18px;min-height:180px}
+.mascot{font-size:clamp(95px,13vw,160px);text-align:center;filter:drop-shadow(0 9px 2px #438e4560);animation:bob 3s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-8px) rotate(3deg)}}
+.speech{background:white;border:4px solid #fff;border-radius:45% 45% 43% 35%;padding:23px 26px;text-align:center;box-shadow:0 7px 0 #a9ddf8;position:relative}
+.speech:before{content:"";position:absolute;left:-13px;bottom:22px;width:28px;height:28px;background:white;transform:rotate(35deg)}
+.speech h2{font-size:clamp(22px,3vw,34px);margin:0 0 6px;color:#7449d5}.speech p{margin:0;font-size:clamp(13px,1.5vw,18px);font-weight:800;line-height:1.4}
+.mission{background:#a96526;color:white;padding:16px;border-radius:19px;border:4px solid #ffce77;box-shadow:0 6px 0 #824a20;text-align:center;transform:rotate(2deg);font-weight:900;font-size:17px}.mission span{display:block;font-size:30px;margin-bottom:4px}
+.agebar{display:flex;justify-content:center;gap:10px;margin-bottom:17px;flex-wrap:wrap}.age{padding:11px 20px;background:#fff;border:3px solid #fff;border-radius:17px;font-weight:1000;color:#5378b2;box-shadow:0 5px 0 #b6def5}.age.active{background:#11c79a;color:#fff;box-shadow:0 5px 0 #078d6d;border-color:#c4fff0}
+.cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:13px}
+.card{background:#fff;border:4px solid white;border-radius:27px;padding:12px 12px 14px;text-align:center;box-shadow:0 8px 0 #4b9c5a55;display:flex;flex-direction:column;min-width:0;position:relative;transition:transform .18s}
+.card:hover{transform:translateY(-6px) rotate(-.5deg)}.card:nth-child(1){background:#fff0f8}.card:nth-child(2){background:#fff8d9}.card:nth-child(3){background:#e9f8ff}.card:nth-child(4){background:#f2eaff}.card:nth-child(5){background:#e4fff4}
+.star{position:absolute;right:7px;top:7px;font-size:25px;filter:drop-shadow(0 2px 0 #fff)}
+.card-art{height:130px;border-radius:20px;background:#ffffffa8;display:flex;align-items:center;justify-content:center;gap:6px;font-size:clamp(32px,4vw,56px);margin-bottom:11px;overflow:hidden}
+.card h3{font-size:clamp(15px,1.45vw,20px);line-height:1.15;margin:0 0 8px;font-weight:1000}.card p{font-size:clamp(11px,1.05vw,14px);line-height:1.35;min-height:38px;margin:0 0 12px;color:#47618d;font-weight:700}
+.play{padding:12px 9px;border-radius:99px;background:#ff4d98;color:#fff;font-weight:1000;font-size:16px;box-shadow:0 4px 0 #d82e78}.card:nth-child(2) .play{background:#ff9f00;box-shadow:0 4px #d47a00}.card:nth-child(3) .play{background:#149be8;box-shadow:0 4px #0875bf}.card:nth-child(4) .play{background:#8757e9;box-shadow:0 4px #633bc4}.card:nth-child(5) .play{background:#08b77b;box-shadow:0 4px #078d5f}
+.achievements{display:grid;grid-template-columns:1.2fr 1fr 1fr 1.1fr;align-items:center;gap:12px;background:#ffffffed;border:4px solid #fff;border-radius:25px;padding:12px 18px;margin-top:18px;box-shadow:0 7px 0 #a6d9b5}
+.ach-title{display:flex;align-items:center;gap:12px;font-size:16px;font-weight:1000}.trophy{font-size:47px}.stat{display:flex;align-items:center;gap:9px;font-weight:1000}.stat .ico{font-size:30px}.stat small{display:block;color:#6c83ab;font-size:11px}.encourage{text-align:center;color:#7449d5;font-weight:1000}.encourage span{font-size:29px;display:block}
+.modal{display:none;position:fixed;inset:0;z-index:10;background:#14376f99;backdrop-filter:blur(7px);padding:15px;align-items:center;justify-content:center}.modal.show{display:flex}.gamebox{width:min(650px,100%);background:#fff;border:6px solid #fff;border-radius:32px;padding:clamp(17px,4vw,30px);box-shadow:0 15px 0 #b6dff8;text-align:center;position:relative}.close{position:absolute;right:13px;top:12px;background:#ffe7f1;color:#bb4381;border-radius:50%;width:39px;height:39px;font-size:22px;font-weight:1000}.gamebox h2{font-size:clamp(23px,4vw,32px);margin:10px 35px 5px}.gamebox .hint{color:#6d83ab;font-weight:800}.game-objects{min-height:120px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:9px;font-size:clamp(37px,8vw,65px);margin:15px 0}.options{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}.option{min-width:85px;min-height:76px;padding:10px 18px;background:#eee9ff;color:#6b4ec3;border-radius:20px;font-size:34px;font-weight:1000;box-shadow:0 5px #d8ccff}.option:nth-child(2){background:#fff0f7;color:#c44881;box-shadow:0 5px #ffd6e7}.option:nth-child(3){background:#e4fff4;color:#087d5a;box-shadow:0 5px #c1f4df}.option:disabled{opacity:.8}.feedback{min-height:34px;font-size:19px;font-weight:1000;margin:15px 0 0}.feedback.good{color:#08a875}.feedback.bad{color:#dc6a48}.next{display:none;background:#8757e9;color:white;padding:13px 25px;border-radius:99px;font-weight:1000;box-shadow:0 4px #633bc4;margin-top:8px}.next.show{display:inline-block}
+@media(max-width:1000px){.cards{grid-template-columns:repeat(3,minmax(0,1fr))}.hero{grid-template-columns:150px 1fr 160px}.card-art{height:110px}.achievements{grid-template-columns:1fr 1fr}.mascot{font-size:110px}}
+@media(max-width:650px){.app{padding:12px}.hero{grid-template-columns:95px 1fr;gap:8px}.mascot{font-size:88px}.mission{grid-column:1/-1;transform:none;padding:10px}.speech{padding:16px 13px}.cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.card-art{height:105px}.card{padding:9px}.card p{min-height:35px}.achievements{grid-template-columns:1fr 1fr;padding:12px}.ach-title{font-size:13px}.trophy{font-size:34px}.badge{padding:7px 10px}.badge:nth-child(2){display:none}.brand{padding:7px 12px}.logo{width:44px;height:44px}.header-right{gap:6px}.round-btn{width:42px;height:42px}.card h3{font-size:16px}}
+@media(max-width:390px){.cards{grid-template-columns:1fr}.card{display:grid;grid-template-columns:95px 1fr;column-gap:10px;text-align:left}.card-art{grid-row:1/4;height:100%;min-height:100px;margin:0}.card h3{align-self:end}.card p{min-height:0}.play{grid-column:2;text-align:center}.star{font-size:18px}}
 </style>
 </head>
-<body>
-<div class="app">
+<body><div class="sky"><div class="app">
 <header>
-  <div class="brand"><div class="logo">🔢</div><div><h1>PequeMates</h1><div class="subtitle">¡Aprender jugando es mágico!</div></div></div>
-  <button class="sound" id="soundBtn" aria-label="Activar o desactivar sonidos">🔊 Sonido</button>
+ <div class="brand"><div class="logo">⭐</div><div><h1>PequeMates</h1><small>¡Aprender también es divertido!</small></div></div>
+ <div class="header-right">
+  <div class="badge"><span class="avatar">🐻</span><span>Peque explorador<small>⭐ <b id="totalStars">0</b> estrellas</small></span></div>
+  <div class="badge"><span class="avatar">🌱</span><span id="levelLabel">Nivel 1<small id="ageLabel">3 años</small></span></div>
+  <button class="round-btn" id="soundBtn" aria-label="Sonido">🔊</button>
+ </div>
 </header>
 <section class="hero">
-  <div><h2>¡Hola, pequeño genio! 🌟</h2><p>Cuenta, descubre los números y diviértete.<br>¡Cada respuesta es un gran logro!</p></div>
-  <div class="hero-art">🧸🍎🌈</div>
+ <div class="mascot">🐻</div>
+ <div class="speech"><h2>¡Hola, campeón!</h2><p>Vamos a explorar el mundo de los números.<br>¡Tú puedes! 💗</p></div>
+ <div class="mission"><span>⭐ 🪵</span>Tu misión de hoy:<br><b id="missionText">contar del 1 al 3</b></div>
 </section>
-<nav class="levels" aria-label="Dificultad">
-  <button class="level active" data-level="easy">🐣 3 años</button>
-  <button class="level" data-level="middle">🐻 4 años</button>
-  <button class="level" data-level="big">🦁 5 años</button>
-</nav>
-<main class="game">
-  <div id="gameContent">
-    <div class="game-top"><div class="progress"><span id="progressFill"></span></div><div class="score">⭐ <span id="score">0</span> puntos</div></div>
-    <div class="instruction" id="question">¿Cuántas manzanas hay?</div>
-    <p class="subinstruction" id="subinstruction">¡Cuéntalas en voz alta y toca el número correcto!</p>
-    <div class="objects" id="objects" aria-label="Objetos para contar"></div>
-    <div class="answers" id="answers"></div>
-    <div class="feedback" id="feedback" aria-live="polite"></div>
-    <button class="next" id="nextBtn">¡Siguiente! ➜</button>
-  </div>
-  <div class="finish" id="finish"><div class="big">🏆🎉</div><h2>¡Lo hiciste genial!</h2><p id="finishText">Has terminado esta ronda.</p><button class="restart" id="restartBtn">Jugar otra vez ↻</button></div>
-</main>
-<div class="footer">💖 <span>Un pasito a la vez: ¡tú puedes!</span> ✨</div>
-</div>
+<nav class="agebar"><button class="age active" data-age="3">🌱 3 años</button><button class="age" data-age="4">🌼 4 años</button><button class="age" data-age="5">🌟 5 años</button></nav>
+<section class="cards">
+ <article class="card"><span class="star">⭐</span><div class="card-art">🍎 🔢 🍎</div><h3>Cuenta y elige</h3><p>Cuenta los objetos y toca el número correcto.</p><button class="play" data-game="count">▶ Jugar</button></article>
+ <article class="card"><span class="star">⭐</span><div class="card-art">🐻 🐻 🐻</div><h3>¿Cuántos hay?</h3><p>¡Mira con atención y descubre cuántos ves!</p><button class="play" data-game="howmany">▶ Jugar</button></article>
+ <article class="card"><span class="star">⭐</span><div class="card-art">🎈 1️⃣ 2️⃣ 3️⃣</div><h3>Ordena números</h3><p>Encuentra cuál número viene después.</p><button class="play" data-game="order">▶ Jugar</button></article>
+ <article class="card"><span class="star">⭐</span><div class="card-art">🔴 ⭐ 🔺</div><h3>Formas divertidas</h3><p>Reconoce círculos, estrellas y triángulos.</p><button class="play" data-game="shapes">▶ Jugar</button></article>
+ <article class="card"><span class="star">⭐</span><div class="card-art">🎨 🦁 🌈</div><h3>Colores y números</h3><p>Cuenta los colores y encuentra el que te piden.</p><button class="play" data-game="colors">▶ Jugar</button></article>
+</section>
+<section class="achievements">
+ <div class="ach-title"><span class="trophy">🏆</span><span>Tus logros<small style="display:block;font-size:11px;color:#6c83ab">¡Lo estás haciendo genial!</small></span></div>
+ <div class="stat"><span class="ico">🌟</span><span><b id="roundStat">0/10</b><small>Retos completados</small></span></div>
+ <div class="stat"><span class="ico">💖</span><span><b id="scoreStat">0</b><small>Puntos ganados</small></span></div>
+ <div class="encourage"><span>🌈☁️</span>¡Sigue así,<br>pequeño genio!</div>
+</section>
+</div></div>
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="gameTitle"><div class="gamebox">
+<button class="close" id="closeBtn" aria-label="Cerrar">×</button><div style="font-size:40px" id="gameIcon">🧸</div><h2 id="gameTitle">¡Vamos a jugar!</h2><div class="hint" id="gameHint">Cuenta con calma.</div><div class="game-objects" id="gameObjects"></div><div class="options" id="options"></div><div class="feedback" id="feedback" aria-live="polite"></div><button class="next" id="nextBtn">¡Siguiente reto! ➜</button>
+</div></div>
 <script>
-(() => {
-  const $ = id => document.getElementById(id);
-  const rounds = 10;
-  let level = 'easy', round = 0, score = 0, answer = null, locked = false, soundOn = true;
-  const objectSets = {
-    easy: ['🍎','⭐','🐥','🍓','🦋','🌼'],
-    middle: ['🍎','🐸','🚗','🍪','🌈','🐠','🌸'],
-    big: ['🍎','🦄','🚀','🍓','🐢','⭐','🍪','🌻']
-  };
-  function speak(text) {
-    if (!soundOn || !('speechSynthesis' in window)) return;
-    window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = 'es-CO'; u.rate = .86; u.pitch = 1.2;
-    window.speechSynthesis.speak(u);
-  }
-  function beep(ok) {
-    if (!soundOn) return;
-    try {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return;
-      const ac = new AudioCtx(), osc = ac.createOscillator(), gain = ac.createGain();
-      osc.connect(gain); gain.connect(ac.destination);
-      osc.frequency.value = ok ? 660 : 230; osc.type = 'sine';
-      gain.gain.setValueAtTime(.12, ac.currentTime);
-      gain.gain.exponentialRampToValueAtTime(.001, ac.currentTime + .22);
-      osc.start(); osc.stop(ac.currentTime + .23);
-      osc.onended = () => ac.close();
-    } catch(e) {}
-  }
-  function maxNumber() { return level === 'easy' ? 3 : level === 'middle' ? 6 : 10; }
-  function randomInt(min,max){return Math.floor(Math.random()*(max-min+1))+min}
-  function makeQuestion() {
-    locked = false;
-    $('feedback').textContent = '';
-    $('feedback').className = 'feedback';
-    $('nextBtn').classList.remove('show');
-    $('progressFill').style.width = `${round / rounds * 100}%`;
-    $('score').textContent = score;
-    const max = maxNumber();
-    answer = randomInt(1,max);
-    const emoji = objectSets[level][randomInt(0,objectSets[level].length-1)];
-    $('question').textContent = '¿Cuántos hay?';
-    $('subinstruction').textContent = 'Cuenta los dibujos y elige el número correcto.';
-    $('objects').innerHTML = '';
-    for(let i=0;i<answer;i++){
-      const span=document.createElement('span'); span.className='object'; span.textContent=emoji;
-      $('objects').appendChild(span);
-    }
-    const options = new Set([answer]);
-    while(options.size<3) options.add(randomInt(1,max));
-    const shuffled=[...options].sort(()=>Math.random()-.5);
-    $('answers').innerHTML='';
-    shuffled.forEach(n=>{
-      const btn=document.createElement('button'); btn.className='answer'; btn.textContent=n;
-      btn.setAttribute('aria-label',`Número ${n}`);
-      btn.addEventListener('click',()=>choose(n,btn));
-      $('answers').appendChild(btn);
-    });
-    speak(`¿Cuántos hay? Cuenta y elige el número.`);
-  }
-  function choose(n,btn) {
-    if(locked) return;
-    if(n===answer){
-      locked=true; score+=10; round++;
-      btn.classList.add('correct');
-      $('feedback').textContent=['¡Muy bien! ⭐','¡Lo lograste! 🎉','¡Eres increíble! 💖','¡Excelente, campeón! 🌈'][randomInt(0,3)];
-      $('feedback').className='feedback good';
-      $('score').textContent=score;
-      $('progressFill').style.width=`${round/rounds*100}%`;
-      $('nextBtn').classList.add('show');
-      $('answers').querySelectorAll('button').forEach(b=>b.disabled=true);
-      beep(true); speak('¡Muy bien! ¡Respuesta correcta!');
-      if(round>=rounds){$('nextBtn').textContent='Ver mis estrellas ✨';}
-    } else {
-      btn.classList.add('wrong');
-      $('feedback').textContent='¡Casi! Vamos a contar otra vez 😊';
-      $('feedback').className='feedback try';
-      beep(false); speak('Casi. Inténtalo otra vez.');
-      setTimeout(()=>btn.classList.remove('wrong'),650);
-    }
-  }
-  function start() {
-    round=0; score=0;
-    $('gameContent').style.display='block'; $('finish').classList.remove('show');
-    $('nextBtn').textContent='¡Siguiente! ➜';
-    makeQuestion();
-  }
-  $('nextBtn').addEventListener('click',()=>{
-    if(round>=rounds){
-      $('gameContent').style.display='none'; $('finish').classList.add('show');
-      $('finishText').textContent=`Ganaste ${score} puntos y completaste ${rounds} retos. ¡Eres una estrella!`;
-      speak(`¡Felicidades! Ganaste ${score} puntos.`);
-    } else makeQuestion();
-  });
-  $('restartBtn').addEventListener('click',start);
-  document.querySelectorAll('.level').forEach(btn=>btn.addEventListener('click',()=>{
-    document.querySelectorAll('.level').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active'); level=btn.dataset.level; start();
-    speak(level==='easy'?'Modo tres años. ¡Vamos a contar!':level==='middle'?'Modo cuatro años. ¡Vamos a jugar!':'Modo cinco años. ¡A por el reto!');
-  }));
-  $('soundBtn').addEventListener('click',()=>{
-    soundOn=!soundOn;
-    $('soundBtn').textContent=soundOn?'🔊 Sonido':'🔇 Silencio';
-    if(!soundOn && 'speechSynthesis' in window) window.speechSynthesis.cancel();
-    else speak('¡Hola! Vamos a jugar.');
-  });
-  start();
+(()=>{
+const $=id=>document.getElementById(id);
+let age=3,stars=0,score=0,completed=0,round=0,currentGame='count',correct=null,locked=false,sound=true;
+const emojis=['🍎','🐥','⭐','🍓','🦋','🐸','🚗','🐠','🌼','🍪'];
+const shapes=[{e:'🔴',n:'círculo'},{e:'⭐',n:'estrella'},{e:'🔺',n:'triángulo'},{e:'🟦',n:'cuadrado'}];
+function rand(a,b){return Math.floor(Math.random()*(b-a+1))+a}
+function speak(t){if(!sound||!('speechSynthesis'in window))return;speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(t);u.lang='es-CO';u.rate=.88;u.pitch=1.18;speechSynthesis.speak(u)}
+function updateStats(){$('totalStars').textContent=stars;$('scoreStat').textContent=score;$('roundStat').textContent=`${completed}/10`;$('levelLabel').textContent=`Nivel ${age-2}`;$('ageLabel').textContent=`${age} años`;$('missionText').textContent=age===3?'contar del 1 al 3':age===4?'contar del 1 al 6':'contar del 1 al 10'}
+function maxN(){return age===3?3:age===4?6:10}
+function openGame(type){currentGame=type;round=0;$('modal').classList.add('show');newRound()}
+function newRound(){
+ locked=false;correct=null;$('feedback').textContent='';$('feedback').className='feedback';$('nextBtn').classList.remove('show');$('options').innerHTML='';$('gameObjects').innerHTML='';
+ const max=maxN();let prompt='',hint='',icon='🧸',opts=[];
+ if(currentGame==='count'||currentGame==='howmany'){
+  const n=rand(1,max),e=emojis[rand(0,Math.min(emojis.length-1,age+3))];correct=n;prompt=currentGame==='count'?'¿Cuántos objetos hay?':'¡Ayuda a contar!';hint='Toca el número que muestra cuántos ves.';icon='🔎';
+  for(let i=0;i<n;i++){let s=document.createElement('span');s.textContent=e;$('gameObjects').appendChild(s)}
+  opts=makeOptions(n,max);
+ }else if(currentGame==='order'){
+  let n=rand(1,Math.max(1,max-1));correct=n+1;prompt=`¿Qué número viene después del ${n}?`;hint='Piensa en la cuenta: uno, dos, tres…';icon='🎈';$('gameObjects').textContent=`${n}   ➜   ❓`;opts=makeOptions(correct,max);
+ }else if(currentGame==='shapes'){
+  const s=shapes[rand(0,age===3?2:3)];correct=s.n;prompt='¿Cómo se llama esta forma?';hint='¡Mira su figura con atención!';icon='🧩';$('gameObjects').textContent=s.e;opts=shuffle([s.n,...shapes.filter(x=>x.n!==s.n).sort(()=>Math.random()-.5).slice(0,2).map(x=>x.n)]);
+ }else{
+  const target=['rojo','azul','amarillo','verde'][rand(0,age===3?2:3)];const map={rojo:'🔴',azul:'🔵',amarillo:'🟡',verde:'🟢'};correct=target;prompt=`Toca el color ${target}`;hint='¡Encuentra el circulito del color indicado!';icon='🎨';$('gameObjects').textContent='🌈';opts=shuffle(Object.keys(map).slice(0,age===3?3:4));opts=opts.map(c=>({label:map[c],value:c}));
+ }
+ $('gameTitle').textContent=prompt;$('gameHint').textContent=hint;$('gameIcon').textContent=icon;
+ opts.forEach(item=>{const val=typeof item==='object'?item.value:item;const label=typeof item==='object'?item.label:item;const b=document.createElement('button');b.className='option';b.textContent=label;b.addEventListener('click',()=>choose(val,b));$('options').appendChild(b)});
+ speak(prompt);
+}
+function makeOptions(n,max){let s=new Set([n]);while(s.size<Math.min(3,max))s.add(rand(1,max));return shuffle([...s])}
+function shuffle(a){return a.sort(()=>Math.random()-.5)}
+function choose(value,btn){
+ if(locked)return;
+ if(String(value)===String(correct)){
+  locked=true;stars++;score+=10;completed=Math.min(10,completed+1);round++;updateStats();btn.style.background='#d9ffeb';btn.style.boxShadow='0 5px #91e4bd';$('feedback').textContent=['¡Súper! ¡Lo hiciste! 🌟','¡Correcto, campeón! 🎉','¡Eres una estrella! 💖','¡Muy bien pensado! 🥳'][rand(0,3)];$('feedback').className='feedback good';$('options').querySelectorAll('button').forEach(b=>b.disabled=true);$('nextBtn').classList.add('show');$('nextBtn').textContent=round%5===0?'¡Celebrar! 🎉':'¡Siguiente reto! ➜';speak('¡Muy bien! ¡Lo hiciste genial!');
+ }else{$('feedback').textContent='¡Inténtalo otra vez! Tú puedes 💪';$('feedback').className='feedback bad';btn.animate([{transform:'translateX(0)'},{transform:'translateX(-5px)'},{transform:'translateX(5px)'},{transform:'translateX(0)'}],{duration:220});speak('Casi. Prueba otra vez.')}
+}
+document.querySelectorAll('.play').forEach(b=>b.addEventListener('click',()=>openGame(b.dataset.game)));
+document.querySelectorAll('.age').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.age').forEach(x=>x.classList.remove('active'));b.classList.add('active');age=Number(b.dataset.age);updateStats();speak(`Nivel para ${age} años. ¡Vamos a jugar!`)}));
+$('nextBtn').addEventListener('click',()=>{newRound()});
+$('closeBtn').addEventListener('click',()=>{$('modal').classList.remove('show');if('speechSynthesis'in window)speechSynthesis.cancel()});
+$('modal').addEventListener('click',e=>{if(e.target===$('modal'))$('closeBtn').click()});
+$('soundBtn').addEventListener('click',()=>{sound=!sound;$('soundBtn').textContent=sound?'🔊':'🔇';if(!sound&&'speechSynthesis'in window)speechSynthesis.cancel();else speak('¡Hola, vamos a jugar!')});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')$('closeBtn').click()});
+updateStats();
 })();
 </script>
-</body>
-</html>
+</body></html>
