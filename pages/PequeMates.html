@@ -38,7 +38,7 @@ h1{font-size:clamp(22px,3vw,34px);margin:0;font-weight:1000;letter-spacing:-1.2p
 .ach-title{display:flex;align-items:center;gap:12px;font-size:16px;font-weight:1000}.trophy{font-size:47px}.stat{display:flex;align-items:center;gap:9px;font-weight:1000}.stat .ico{font-size:30px}.stat small{display:block;color:#6c83ab;font-size:11px}.encourage{text-align:center;color:#7449d5;font-weight:1000}.encourage span{font-size:29px;display:block}
 .modal{display:none;position:fixed;inset:0;z-index:10;background:#14376f99;backdrop-filter:blur(7px);padding:15px;align-items:center;justify-content:center}.modal.show{display:flex}.gamebox{width:min(650px,100%);background:#fff;border:6px solid #fff;border-radius:32px;padding:clamp(17px,4vw,30px);box-shadow:0 15px 0 #b6dff8;text-align:center;position:relative}.close{position:absolute;right:13px;top:12px;background:#ffe7f1;color:#bb4381;border-radius:50%;width:39px;height:39px;font-size:22px;font-weight:1000}.gamebox h2{font-size:clamp(23px,4vw,32px);margin:10px 35px 5px}.gamebox .hint{color:#6d83ab;font-weight:800}.game-objects{min-height:120px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:9px;font-size:clamp(37px,8vw,65px);margin:15px 0}.options{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}.option{min-width:85px;min-height:76px;padding:10px 18px;background:#eee9ff;color:#6b4ec3;border-radius:20px;font-size:34px;font-weight:1000;box-shadow:0 5px #d8ccff}.option:nth-child(2){background:#fff0f7;color:#c44881;box-shadow:0 5px #ffd6e7}.option:nth-child(3){background:#e4fff4;color:#087d5a;box-shadow:0 5px #c1f4df}.option:disabled{opacity:.8}.feedback{min-height:34px;font-size:19px;font-weight:1000;margin:15px 0 0}.feedback.good{color:#08a875}.feedback.bad{color:#dc6a48}.next{display:none;background:#8757e9;color:white;padding:13px 25px;border-radius:99px;font-weight:1000;box-shadow:0 4px #633bc4;margin-top:8px}.next.show{display:inline-block}
 @media(max-width:1000px){.cards{grid-template-columns:repeat(3,minmax(0,1fr))}.hero{grid-template-columns:150px 1fr 160px}.card-art{height:110px}.achievements{grid-template-columns:1fr 1fr}.mascot{font-size:110px}}
-@media(max-width:650px){.app{padding:12px}.hero{grid-template-columns:95px 1fr;gap:8px}.mascot{font-size:88px}.mission{grid-column:1/-1;transform:none;padding:10px}.speech{padding:16px 13px}.cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.card-art{height:105px}.card{padding:9px}.card p{min-height:35px}.achievements{grid-template-columns:1fr 1fr;padding:12px}.ach-title{font-size:13px}.trophy{font-size:34px}.badge{padding:7px 10px}.badge:nth-child(2){display:none}.brand{padding:7px 12px}.logo{width:44px;height:44px}.header-right{gap:6px}.round-btn{width:42px;height:42px}.card h3{font-size:16px}}
+@media(max-width:650px){.app{padding:12px}.hero{grid-template-columns:95px 1fr;gap:8px}.mascot{font-size:88px}.mission{grid-column:1/-1;transform:none;padding:10px}.speech{padding:16px 13px}.cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.card-art{height:105px}.card{padding:9px}.card p{min-height:35px}.achievements{grid-template-columns:1fr 1fr;padding:12px}.ach-title{font-size:13px}.trophy{font-size:34px}.badge{padding:7px 10px}.badge:nth-child(2):not(.keep){display:none}.brand{padding:7px 12px}.logo{width:44px;height:44px}.header-right{gap:6px}.round-btn{width:42px;height:42px}.card h3{font-size:16px}}
 @media(max-width:390px){.cards{grid-template-columns:1fr}.card{display:grid;grid-template-columns:95px 1fr;column-gap:10px;text-align:left}.card-art{grid-row:1/4;height:100%;min-height:100px;margin:0}.card h3{align-self:end}.card p{min-height:0}.play{grid-column:2;text-align:center}.star{font-size:18px}}
 </style>
 </head>
@@ -62,7 +62,7 @@ h1{font-size:clamp(22px,3vw,34px);margin:0;font-weight:1000;letter-spacing:-1.2p
  <article class="card"><span class="star">⭐</span><div class="card-art">🍎 🔢 🍎</div><h3>Cuenta y elige</h3><p>Cuenta los objetos y toca el número correcto.</p><button class="play" data-game="count">▶ Jugar</button></article>
  <article class="card"><span class="star">⭐</span><div class="card-art">🐻 🐻 🐻</div><h3>¿Cuántos hay?</h3><p>¡Mira con atención y descubre cuántos ves!</p><button class="play" data-game="howmany">▶ Jugar</button></article>
  <article class="card"><span class="star">⭐</span><div class="card-art">🎈 1️⃣ 2️⃣ 3️⃣</div><h3>Ordena números</h3><p>Encuentra cuál número viene después.</p><button class="play" data-game="order">▶ Jugar</button></article>
- <article class="card"><span class="star">⭐</span><div class="card-art">🔴 ⭐ 🔺</div><h3>Formas divertidas</h3><p>Reconoce figuras geométricas según la edad.</p><button class="play" data-game="shapes">▶ Jugar</button></article>
+ <article class="card"><span class="star">⭐</span><div class="card-art">⚽ 🍕 🪟</div><h3>Formas y objetos</h3><p>Empareja cada figura con su objeto real.</p><button class="play" data-game="shapes">▶ Jugar</button></article>
  <article class="card"><span class="star" id="card5Star">⭐</span><div class="card-art" id="card5Art">🎨 🦁 🌈</div><h3 id="card5Title">Colores y números</h3><p id="card5Desc">Cuenta los colores y encuentra el que te piden.</p><button class="play" data-game="colors">▶ Jugar</button></article>
 </section>
 <section class="achievements">
@@ -92,13 +92,13 @@ const $=id=>document.getElementById(id);
 let age=3,stars=0,score=0,completed=0,round=0,currentGame='count',correct=null,locked=false,sound=true;
 const emojis=['🍎','🐥','⭐','🍓','🦋','🐸','🚗','🐠','🌼','🍪'];
 
-// Formas adaptadas según la edad (más variedad para 4 y 5 años)
-const allShapes=[
-  {e:'🔴',n:'círculo'},
-  {e:'🟦',n:'cuadrado'},
-  {e:'🔺',n:'triángulo'},
-  {e:'⭐',n:'estrella'},
-  {e:'🟩',n:'rectángulo'}
+// NUEVO: Relacionar figura geométrica con objeto real (sin texto)
+const shapePairs = [
+  { shape: '⚽', name: 'círculo', real: '⚽' },
+  { shape: '🍕', name: 'triángulo', real: '🍕' },
+  { shape: '🪟', name: 'cuadrado', real: '🪟' },
+  { shape: '⭐', name: 'estrella', real: '⭐' },
+  { shape: '🚪', name: 'rectángulo', real: '🚪' }
 ];
 
 function rand(a,b){return Math.floor(Math.random()*(b-a+1))+a}
@@ -130,12 +130,11 @@ function updateStats(){
   if($('levelLabel'))$('levelLabel').textContent=`Nivel ${age-2}`;
   if($('ageLabel'))$('ageLabel').textContent=`${age} años`;
   if($('missionText')) {
-    if(age===3) $('missionText').textContent='contar del 1 al 3 y formas básicas';
+    if(age===3) $('missionText').textContent='contar del 1 al 3 y objetos reales';
     else if(age===4) $('missionText').textContent='contar del 1 al 6 y secuencias';
     else $('missionText').textContent='contar hasta 10 y sumas mágicas';
   }
 
-  // Cambiar título de la tarjeta 5 si tiene 5 años (Suma mágica en vez de colores)
   if(age===5){
     $('card5Title').textContent='Suma mágica';
     $('card5Desc').textContent='Suma dos grupos de frutas y halla el total.';$('card5Art').textContent='🍎 ➕ 🍎';
@@ -147,7 +146,6 @@ function updateStats(){
 
 function maxN(){return age===3?3:age===4?6:10}
 function openGame(type){
-  // Si es 5 años y pinchan colores, cambiamos a modo suma
   if(type==='colors' && age===5) type='sum';
   currentGame=type;
   round=0;
@@ -175,7 +173,6 @@ function newRound(){
     opts=makeOptions(n,max);
 
   }else if(currentGame==='order'){
-    // Para 3 años: números 1 a 2. Para 4: 1 a 5. Para 5: 1 a 9.
     const limitMax = age===3 ? 2 : (age===4 ? 5 : 9);
     let n=rand(1,limitMax);
     correct=n+1;
@@ -186,25 +183,27 @@ function newRound(){
     opts=makeOptions(correct, age===3? 3 : (age===4? 6 : 10));
 
   }else if(currentGame==='shapes'){
-    // 3 años: 3 formas (círculo, cuadrado, triángulo)
-    // 4 años: 4 formas (+ estrella)
-    // 5 años: 5 formas (+ rectángulo)
-    const shapeLimit = age===3 ? 3 : (age===4 ? 4 : 5);
-    const availableShapes = allShapes.slice(0, shapeLimit);
-    const s = availableShapes[rand(0, availableShapes.length-1)];
+    // NUEVA DINÁMICA VISUAL: Mostrar un objeto real y buscar qué figura tiene su forma (sin texto)
+    const limitPairs = age===3 ? 3 : (age===4 ? 4 : 5);
+    const availablePairs = shapePairs.slice(0, limitPairs);
+    const targetPair = availablePairs[rand(0, availablePairs.length - 1)];
     
-    correct=s.n;
-    prompt='¿Cómo se llama esta figura?';
-    hint='Observa sus esquinas y lados con atención.';
-    icon='🧩';
-    $('gameObjects').textContent=s.e;
+    correct = targetPair.shape; // La respuesta correcta es la figura geométrica emoji
+    prompt = `¿Qué figura tiene la forma de esto?`;
+    hint = 'Toca la figura geométrica que coincide con el objeto.';
+    icon = '🧩';
     
-    // Opciones basadas solo en las formas disponibles para esa edad
-    opts=shuffle([s.n, ...availableShapes.filter(x=>x.n!==s.n).map(x=>x.n)]).slice(0, age===3?2:3);
-    opts=shuffle(opts);
+    // Mostramos el objeto real arriba (ej: una pizza o un balón)
+    $('gameObjects').textContent = targetPair.real;
+    
+    // Las opciones son figuras geométricas puras (emojis)
+    opts = shuffle(availablePairs.map(p => p.shape)).slice(0, age===3 ? 2 : 3);
+    if(!opts.includes(correct)){
+      opts[0] = correct;
+    }
+    opts = shuffle(opts);
 
   }else if(currentGame==='colors'){
-    // Modo colores para 3 y 4 años
     const colorLimit = age===3 ? 3 : 4;
     const target=['rojo','azul','amarillo','verde'][rand(0, colorLimit-1)];
     const map={rojo:'🔴',azul:'🔵',amarillo:'🟡',verde:'🟢'};
@@ -217,7 +216,6 @@ function newRound(){
     opts=shuffle(availableColors).map(c=>({label:map[c],value:c}));
 
   }else if(currentGame==='sum'){
-    // ¡NUEVO JUEGO EXCLUSIVO PARA 5 AÑOS: SUMAS FÁCILES!
     const n1 = rand(1, 4);
     const n2 = rand(1, 4);
     correct = n1 + n2;
@@ -225,7 +223,6 @@ function newRound(){
     hint = 'Junta los dos grupos de frutas y cuenta el total.';
     icon = '➕';
     
-    // Mostrar visualmente las frutas sumándose
     let container = document.createElement('div');
     container.style.display = 'flex';
     container.style.alignItems = 'center';
