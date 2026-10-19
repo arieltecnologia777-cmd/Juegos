@@ -75,11 +75,6 @@
         <button class="sticker" data-sticker="✨" title="Brillitos">✨</button>
         <button class="sticker" data-sticker="🌙" title="Luna">🌙</button>
       </div>
-
-      <div class="side-actions">
-        <button class="small-btn" id="undoBtn">↶ Deshacer</button>
-        <button class="small-btn" id="clearBtn">⌫ Limpiar lienzo</button>
-      </div>
     </aside>
 
     <section class="panel stage-panel">
@@ -93,7 +88,10 @@
       </div>
       <div class="stage-foot">
         <span>💗 Hecho por ti, único en el mundo.</span>
-        <div class="shortcuts"><span class="shortcut">Ctrl + Z · Deshacer</span><span class="shortcut">PNG · Guardar</span></div>
+        <div class="shortcuts">
+          <button class="action-chip" id="undoBtn">↶ Deshacer</button>
+          <button class="action-chip" id="clearBtn">⌫ Limpiar</button>
+        </div>
       </div>
     </section>
   </main>
